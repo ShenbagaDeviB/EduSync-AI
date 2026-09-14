@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const departmentRoutes = require("./routes/departmentRoutes");
 const libraryIssueRoutes = require("./routes/libraryIssueRoutes");
 const libraryBookRoutes = require("./routes/libraryBookRoutes");
 const timetableRoutes = require("./routes/timetableRoutes");
@@ -29,6 +30,7 @@ app.use("/api/fees", feeRoutes);
 app.use("/api/timetables", timetableRoutes);
 app.use("/api/library-books", libraryBookRoutes);
 app.use("/api/library-issues", libraryIssueRoutes);
+app.use("/api/departments", departmentRoutes);
 app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
