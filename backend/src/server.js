@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const enrollmentRoutes = require("./routes/enrollmentRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
 const libraryIssueRoutes = require("./routes/libraryIssueRoutes");
 const libraryBookRoutes = require("./routes/libraryBookRoutes");
@@ -31,6 +32,7 @@ app.use("/api/timetables", timetableRoutes);
 app.use("/api/library-books", libraryBookRoutes);
 app.use("/api/library-issues", libraryIssueRoutes);
 app.use("/api/departments", departmentRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
