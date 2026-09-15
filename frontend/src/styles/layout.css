@@ -12,6 +12,7 @@
   left: 0;
   top: 0;
   bottom: 0;
+  overflow-y: auto;
 }
 
 .sidebar h2 {
@@ -92,6 +93,12 @@
 
 .dashboard-card h3 {
   margin-top: 0;
+}
+
+.sidebar nav a {
+  display: block;
+  color: white;
+  text-decoration: none;
 }
 
 @media (max-width: 900px) {
