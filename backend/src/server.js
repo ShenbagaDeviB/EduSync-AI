@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const documentRoutes = require("./routes/documentRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const hostelAllocationRoutes = require("./routes/hostelAllocationRoutes");
@@ -47,6 +48,7 @@ app.use("/api/hostel-rooms", hostelRoomRoutes);
 app.use("/api/hostel-allocations", hostelAllocationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/announcements", announcementRoutes);
+app.use("/api/documents", documentRoutes);
 app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
