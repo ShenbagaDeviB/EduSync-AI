@@ -1,4 +1,5 @@
 import "./App.css";
+import Login from "./pages/Login";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
@@ -54,6 +55,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
+        <Route path="/login" element={<Login />} />
 
           {/* Dashboard */}
           <Route path="/" element={<Dashboard />} />
