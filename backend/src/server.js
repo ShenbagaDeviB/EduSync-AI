@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const hostelAllocationRoutes = require("./routes/hostelAllocationRoutes");
 const hostelRoomRoutes = require("./routes/hostelRoomRoutes");
 const hostelRoutes = require("./routes/hostelRoutes");
 const leaveRoutes = require("./routes/leaveRoutes");
@@ -41,6 +42,7 @@ app.use("/api/payrolls", payrollRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/hostels", hostelRoutes);
 app.use("/api/hostel-rooms", hostelRoomRoutes);
+app.use("/api/hostel-allocations", hostelAllocationRoutes);
 app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
