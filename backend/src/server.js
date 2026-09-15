@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const eventRegistrationRoutes = require("./routes/eventRegistrationRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const documentRoutes = require("./routes/documentRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
@@ -51,6 +52,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/event-registrations", eventRegistrationRoutes);
 app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
