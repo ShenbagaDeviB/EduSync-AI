@@ -1,47 +1,18 @@
-const detectIntent = (command) => {
-    const text = command.toLowerCase();
+const { mockLLM } = require("./mockLLMService");
 
-    if (text.includes("attendance")) {
+const detectIntent = async (command) => {
+    const decision = await mockLLM(command);
+
+    if (!decision || typeof decision.intent !== "string") {
         return {
-            intent: "get_attendance",
-            params: {}
-        };
-    }
-
-    if (text.includes("fee")) {
-        return {
-            intent: "get_fee_status",
-            params: {}
-        };
-    }
-
-    if (text.includes("result")) {
-        const studentId =
-            command.match(/\b[A-Za-z]+\d+\b/)?.[0];
-
-        if (studentId) {
-            return {
-                intent: "get_subject_results",
-                params: { studentId }
-            };
-        }
-
-        return {
-            intent: "get_results",
-            params: {}
-        };
-    }
-
-    if (text.includes("student")) {
-        return {
-            intent: "get_students",
+            intent: "unknown",
             params: {}
         };
     }
 
     return {
-        intent: "unknown",
-        params: {}
+        intent: decision.intent,
+        params: decision.params || {}
     };
 };
 

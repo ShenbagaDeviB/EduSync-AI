@@ -2,7 +2,7 @@ const { detectIntent } = require("./aiDecisionEngine");
 const executeTool = require("./toolExecutor");
 
 const processAICommand = async (command) => {
-    const decision = detectIntent(command);
+    const decision = await detectIntent(command);
 
     console.log("AI Decision:", decision);
     if (decision.intent !== "unknown") {
