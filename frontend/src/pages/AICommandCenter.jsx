@@ -19,7 +19,7 @@ const AICommandCenter = () => {
         command
       });
 
-      if(result.data.tool === "get_students") {
+      if (result.data.tool === "get_students") {
         setResponse(
           result.data.data
             .map(
@@ -37,8 +37,39 @@ const AICommandCenter = () => {
             )
             .join("\n")
         );
+      } else if (result.data.tool === "get_results") {
+        setResponse(
+          result.data.data
+            .map(
+              (result) =>
+                `${result.studentId} - ${result.examId} - ${result.marksObtained} marks - Grade: ${result.grade}`
+            )
+            .join("\n")
+        );
+      } else if (result.data.tool === "get_subject_results") {
+        setResponse(
+          result.data.data.length === 0
+            ? "No results found for this student."
+            : result.data.data
+              .map(
+                (item) =>
+                  `${item.studentId} - ${item.examId} - ${item.marksObtained} marks - Grade: ${item.grade}`
+              )
+              .join("\n")
+        );
+      } else if (result.data.tool === "get_fee_status") {
+        setResponse(
+          result.data.data
+            .map(
+              (fee) =>
+                `${fee.studentId} - ₹${fee.amount} - ${fee.status} - Due: ${new Date(fee.dueDate).toLocaleDateString()}`
+            )
+            .join("\n")
+        );
       } else {
-        setResponse(result.data.message || "No response received");
+        setResponse(
+          result.data.message || "No response received"
+        );
       }
     } catch (error) {
       setResponse(
@@ -62,7 +93,7 @@ const AICommandCenter = () => {
         <textarea
           value={command}
           onChange={(e) => setCommand(e.target.value)}
-          placeholder="Example: Show students with attendance below 75%"
+          placeholder="Example: Show student results"
           rows="5"
           style={{
             width: "100%",
@@ -91,7 +122,10 @@ const AICommandCenter = () => {
           }}
         >
           <h3>AI Response</h3>
-          <p>{response}</p>
+
+          <p style={{ whiteSpace: "pre-line" }}>
+            {response}
+          </p>
         </div>
       )}
     </main>
