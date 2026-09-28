@@ -4,7 +4,7 @@ const executeTool = require("./toolExecutor");
 const runAgent = async (command) => {
     const decision = await detectIntent(command);
     console.log("AI Agent Decision:", decision);
-    
+
     if (decision.intent === "unknown") {
         return {
             success: false,
@@ -16,12 +16,16 @@ const runAgent = async (command) => {
         decision.intent,
         decision.params
     );
+    console.log("AI Tool Result:", data);
 
     return {
         success: true,
         intent: decision.intent,
         tool: decision.intent,
-        data
+        data,
+        message: data.length
+            ? "Here is the requested information."
+            : "No records found."
     };
 };
 
