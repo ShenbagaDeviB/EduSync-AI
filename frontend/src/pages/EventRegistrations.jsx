@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialForm = {
+  registrationId: "",
+  eventId: "",
+  participantId: "",
+  participantType: "Student",
+  registrationDate: "",
+  status: "Registered",
+};
+
 const EventRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);
   const [editingRegistration, setEditingRegistration] = useState(null);
-
-  const [formData, setFormData] = useState({
-    registrationId: "",
-    eventId: "",
-    participantId: "",
-    participantType: "Student",
-    registrationDate: "",
-    status: "Registered"
-  });
+  const [formData, setFormData] = useState(initialForm);
 
   const fetchRegistrations = async () => {
     try {
@@ -30,19 +31,13 @@ const EventRegistrations = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const resetForm = () => {
-    setFormData({
-      registrationId: "",
-      eventId: "",
-      participantId: "",
-      participantType: "Student",
-      registrationDate: "",
-      status: "Registered"
-    });
+    setFormData(initialForm);
+    setEditingRegistration(null);
   };
 
   const handleSubmit = async (e) => {
@@ -53,7 +48,7 @@ const EventRegistrations = () => {
         ...formData,
         registrationDate: formData.registrationDate
           ? new Date(formData.registrationDate)
-          : undefined
+          : undefined,
       };
 
       if (editingRegistration) {
@@ -63,7 +58,6 @@ const EventRegistrations = () => {
         );
 
         alert("Event registration updated successfully");
-        setEditingRegistration(null);
       } else {
         await api.post("/event-registrations", data);
         alert("Event registration added successfully");
@@ -74,7 +68,7 @@ const EventRegistrations = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save event registration"
+          "Failed to save event registration"
       );
     }
   };
@@ -90,7 +84,7 @@ const EventRegistrations = () => {
       registrationDate: registration.registrationDate
         ? registration.registrationDate.split("T")[0]
         : "",
-      status: registration.status
+      status: registration.status,
     });
   };
 
@@ -112,130 +106,285 @@ const EventRegistrations = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete event registration"
+          "Failed to delete event registration"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Event Registrations</h2>
+    <main className="dashboard event-registrations-page">
+      <div className="event-registrations-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="registrationId"
-          placeholder="Registration ID"
-          value={formData.registrationId}
-          onChange={handleChange}
-          required
-        />
+        <div className="event-registrations-header">
+          <div>
+            <h2>Event Registrations</h2>
+            <p>
+              Manage student, faculty, and staff event registrations.
+            </p>
+          </div>
 
-        <input
-          name="eventId"
-          placeholder="Event ID"
-          value={formData.eventId}
-          onChange={handleChange}
-          required
-        />
+          <div className="event-registrations-count">
+            <strong>{registrations.length}</strong>
+            <span>Total Registrations</span>
+          </div>
+        </div>
 
-        <input
-          name="participantId"
-          placeholder="Participant ID"
-          value={formData.participantId}
-          onChange={handleChange}
-          required
-        />
+        <div className="event-registration-form-card">
 
-        <select
-          name="participantType"
-          value={formData.participantType}
-          onChange={handleChange}
-          required
-        >
-          <option value="Student">Student</option>
-          <option value="Faculty">Faculty</option>
-          <option value="Staff">Staff</option>
-        </select>
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingRegistration
+                  ? "Edit Registration"
+                  : "Add Registration"}
+              </h3>
 
-        <input
-          name="registrationDate"
-          type="date"
-          value={formData.registrationDate}
-          onChange={handleChange}
-        />
+              <p>
+                {editingRegistration
+                  ? "Update the registration details below."
+                  : "Enter the details to register a participant."}
+              </p>
+            </div>
+          </div>
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          required
-        >
-          <option value="Registered">Registered</option>
-          <option value="Attended">Attended</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
+          <form onSubmit={handleSubmit}>
 
-        <button type="submit">
-          {editingRegistration
-            ? "Update Registration"
-            : "Add Registration"}
-        </button>
-      </form>
+            <div className="event-registration-form-grid">
 
-      <hr />
+              <div className="form-group">
+                <label htmlFor="registrationId">
+                  Registration ID
+                </label>
 
-      <h3>Event Registration Records</h3>
+                <input
+                  id="registrationId"
+                  name="registrationId"
+                  placeholder="Enter registration ID"
+                  value={formData.registrationId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      {registrations.length === 0 ? (
-        <p>No event registrations found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Registration ID</th>
-              <th>Event ID</th>
-              <th>Participant ID</th>
-              <th>Participant Type</th>
-              <th>Registration Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+              <div className="form-group">
+                <label htmlFor="eventId">
+                  Event ID
+                </label>
 
-          <tbody>
-            {registrations.map((registration) => (
-              <tr key={registration._id}>
-                <td>{registration.registrationId}</td>
-                <td>{registration.eventId}</td>
-                <td>{registration.participantId}</td>
-                <td>{registration.participantType}</td>
-                <td>
-                  {registration.registrationDate
-                    ? registration.registrationDate.split("T")[0]
-                    : ""}
-                </td>
-                <td>{registration.status}</td>
+                <input
+                  id="eventId"
+                  name="eventId"
+                  placeholder="Enter event ID"
+                  value={formData.eventId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                <td>
-                  <button
-                    onClick={() => handleEdit(registration)}
-                  >
-                    Edit
-                  </button>
+              <div className="form-group">
+                <label htmlFor="participantId">
+                  Participant ID
+                </label>
 
-                  <button
-                    onClick={() =>
-                      handleDelete(registration._id)
-                    }
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                <input
+                  id="participantId"
+                  name="participantId"
+                  placeholder="Enter participant ID"
+                  value={formData.participantId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="participantType">
+                  Participant Type
+                </label>
+
+                <select
+                  id="participantType"
+                  name="participantType"
+                  value={formData.participantType}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Student">Student</option>
+                  <option value="Faculty">Faculty</option>
+                  <option value="Staff">Staff</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="registrationDate">
+                  Registration Date
+                </label>
+
+                <input
+                  id="registrationDate"
+                  name="registrationDate"
+                  type="date"
+                  value={formData.registrationDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="status">
+                  Status
+                </label>
+
+                <select
+                  id="status"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Registered">Registered</option>
+                  <option value="Attended">Attended</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+
+            </div>
+
+            <div className="event-registration-form-actions">
+
+              {editingRegistration && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingRegistration
+                  ? "Update Registration"
+                  : "Add Registration"}
+              </button>
+
+            </div>
+
+          </form>
+        </div>
+
+        <div className="event-registration-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Event Registration Records</h3>
+              <p>
+                View and manage all event registrations.
+              </p>
+            </div>
+          </div>
+
+          {registrations.length === 0 ? (
+            <div className="event-registration-empty-state">
+              <h4>No event registrations found</h4>
+              <p>
+                Add your first registration using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="event-registration-table-wrapper">
+
+              <table className="event-registration-table">
+
+                <thead>
+                  <tr>
+                    <th>Registration ID</th>
+                    <th>Event ID</th>
+                    <th>Participant ID</th>
+                    <th>Participant Type</th>
+                    <th>Registration Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {registrations.map((registration) => (
+                    <tr key={registration._id}>
+
+                      <td className="event-registration-id">
+                        {registration.registrationId}
+                      </td>
+
+                      <td>{registration.eventId}</td>
+
+                      <td>{registration.participantId}</td>
+
+                      <td>
+                        <span className="participant-type-badge">
+                          {registration.participantType}
+                        </span>
+                      </td>
+
+                      <td>
+                        {registration.registrationDate
+                          ? registration.registrationDate.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`event-registration-status-badge ${
+                            registration.status === "Registered"
+                              ? "registration-registered"
+                              : registration.status === "Attended"
+                              ? "registration-attended"
+                              : "registration-cancelled"
+                          }`}
+                        >
+                          {registration.status}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="event-registration-actions">
+
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(registration)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(registration._id)
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
     </main>
   );
 };
