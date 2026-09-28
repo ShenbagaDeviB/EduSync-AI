@@ -1,5 +1,10 @@
+const llmTools = require("./llmTools");
 const aiResponseSchema = require("./aiResponseSchema");
 const mockLLM = async (command) => {
+    console.log(
+        "Available LLM tools:",
+        llmTools.map((tool) => tool.name)
+    );
     const text = command.toLowerCase();
 
     if (text.includes("attendance")) {

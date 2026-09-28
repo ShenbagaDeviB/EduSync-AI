@@ -1,27 +1,7 @@
-const { detectIntent } = require("./aiDecisionEngine");
-const executeTool = require("./toolExecutor");
+const { runAgent } = require("./agentController");
 
 const processAICommand = async (command) => {
-    const decision = await detectIntent(command);
-
-    console.log("AI Decision:", decision);
-    if (decision.intent !== "unknown") {
-        const data = await executeTool(
-            decision.intent,
-            decision.params
-        );
-
-        return {
-            success: true,
-            tool: decision.intent,
-            data
-        };
-    }
-    
-    return {
-        success: true,
-        message: `AI received your command: ${command}`
-    };
+    return await runAgent(command);
 };
 
 module.exports = {
