@@ -1,17 +1,33 @@
 import { useState } from "react";
+import api from "../api/api";
 
 const AICommandCenter = () => {
   const [command, setCommand] = useState("");
   const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleCommand = (e) => {
+  const handleCommand = async (e) => {
     e.preventDefault();
 
     if (!command.trim()) return;
 
-    setResponse(
-      "AI is ready to process your ERP request. AI backend integration will be connected next."
-    );
+    try {
+      setLoading(true);
+      setResponse("");
+
+      const result = await api.post("/ai", {
+        command
+      });
+
+      setResponse(result.data.message);
+    } catch (error) {
+      setResponse(
+        error.response?.data?.message ||
+        "AI request failed"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,8 +54,8 @@ const AICommandCenter = () => {
 
         <br />
 
-        <button type="submit">
-          Ask AI
+        <button type="submit" disabled={loading}>
+          {loading ? "Processing..." : "Ask AI"}
         </button>
       </form>
 

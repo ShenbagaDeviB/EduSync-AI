@@ -1,6 +1,7 @@
 require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
+const aiRoutes = require("./routes/aiRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const eventRegistrationRoutes = require("./routes/eventRegistrationRoutes");
@@ -59,6 +60,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/event-registrations", eventRegistrationRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/complaints", complaintRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
