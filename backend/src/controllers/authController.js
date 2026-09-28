@@ -49,14 +49,14 @@ const loginUser = async (req, res) => {
       });
     }
     const token = jwt.sign(
-  { id: user._id, role: user.role },
-  process.env.JWT_SECRET,
-  { expiresIn: "1d" }
-);
-res.status(200).json({
-  message: "Login successful",
-  token
-});
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+    res.status(200).json({
+      message: "Login successful",
+      token
+    });
   } catch (error) {
     res.status(500).json({
       message: "Login failed",
@@ -64,7 +64,22 @@ res.status(200).json({
     });
   }
 };
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   registerUser,
-  loginUser
+  loginUser,
+  getUsers
 };
