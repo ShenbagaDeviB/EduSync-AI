@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialForm = {
+  examId: "",
+  examName: "",
+  subjectId: "",
+  examDate: "",
+  maxMarks: "",
+};
+
 const Exams = () => {
   const [exams, setExams] = useState([]);
   const [editingExam, setEditingExam] = useState(null);
-
-  const [formData, setFormData] = useState({
-    examId: "",
-    examName: "",
-    subjectId: "",
-    examDate: "",
-    maxMarks: ""
-  });
+  const [formData, setFormData] = useState(initialForm);
 
   const fetchExams = async () => {
     try {
@@ -29,8 +30,13 @@ const Exams = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const resetForm = () => {
+    setFormData(initialForm);
+    setEditingExam(null);
   };
 
   const handleSubmit = async (e) => {
@@ -39,32 +45,24 @@ const Exams = () => {
     try {
       const data = {
         ...formData,
-        maxMarks: Number(formData.maxMarks)
+        maxMarks: Number(formData.maxMarks),
       };
 
       if (editingExam) {
         await api.put(`/exams/${editingExam._id}`, data);
 
         alert("Exam updated successfully");
-        setEditingExam(null);
       } else {
         await api.post("/exams", data);
         alert("Exam added successfully");
       }
 
-      setFormData({
-        examId: "",
-        examName: "",
-        subjectId: "",
-        examDate: "",
-        maxMarks: ""
-      });
-
+      resetForm();
       fetchExams();
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save exam"
+          "Failed to save exam"
       );
     }
   };
@@ -76,13 +74,19 @@ const Exams = () => {
       examId: exam.examId,
       examName: exam.examName,
       subjectId: exam.subjectId,
-      examDate: exam.examDate.split("T")[0],
-      maxMarks: exam.maxMarks
+      examDate: exam.examDate
+        ? exam.examDate.split("T")[0]
+        : "",
+      maxMarks: exam.maxMarks,
     });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this exam?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this exam?"
+      )
+    ) {
       return;
     }
 
@@ -95,108 +99,256 @@ const Exams = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete exam"
+          "Failed to delete exam"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Exams</h2>
+    <main className="dashboard exams-page">
+      <div className="exams-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="examId"
-          placeholder="Exam ID"
-          value={formData.examId}
-          onChange={handleChange}
-          required
-        />
+        <div className="exams-header">
+          <div>
+            <h2>Exams</h2>
+            <p>
+              Manage examinations, subjects, schedules, and marks.
+            </p>
+          </div>
 
-        <input
-          name="examName"
-          placeholder="Exam Name"
-          value={formData.examName}
-          onChange={handleChange}
-          required
-        />
+          <div className="exams-count">
+            <strong>{exams.length}</strong>
+            <span>Total Exams</span>
+          </div>
+        </div>
 
-        <input
-          name="subjectId"
-          placeholder="Subject ID"
-          value={formData.subjectId}
-          onChange={handleChange}
-          required
-        />
+        <div className="exam-form-card">
 
-        <input
-          name="examDate"
-          type="date"
-          value={formData.examDate}
-          onChange={handleChange}
-          required
-        />
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingExam
+                  ? "Edit Exam"
+                  : "Add Exam"}
+              </h3>
 
-        <input
-          name="maxMarks"
-          type="number"
-          placeholder="Maximum Marks"
-          value={formData.maxMarks}
-          onChange={handleChange}
-          required
-        />
+              <p>
+                {editingExam
+                  ? "Update the examination details below."
+                  : "Enter the details to create a new exam."}
+              </p>
+            </div>
+          </div>
 
-        <button type="submit">
-          {editingExam ? "Update Exam" : "Add Exam"}
-        </button>
-      </form>
+          <form onSubmit={handleSubmit}>
 
-      <hr />
+            <div className="exam-form-grid">
 
-      <h3>Exam Records</h3>
+              <div className="form-group">
+                <label htmlFor="examId">
+                  Exam ID
+                </label>
 
-      {exams.length === 0 ? (
-        <p>No exams found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Exam ID</th>
-              <th>Exam Name</th>
-              <th>Subject ID</th>
-              <th>Exam Date</th>
-              <th>Max Marks</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+                <input
+                  id="examId"
+                  name="examId"
+                  placeholder="Enter exam ID"
+                  value={formData.examId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          <tbody>
-            {exams.map((exam) => (
-              <tr key={exam._id}>
-                <td>{exam.examId}</td>
-                <td>{exam.examName}</td>
-                <td>{exam.subjectId}</td>
-                <td>{exam.examDate.split("T")[0]}</td>
-                <td>{exam.maxMarks}</td>
+              <div className="form-group">
+                <label htmlFor="examName">
+                  Exam Name
+                </label>
 
-                <td>
-                  <button
-                    onClick={() => handleEdit(exam)}
-                  >
-                    Edit
-                  </button>
+                <input
+                  id="examName"
+                  name="examName"
+                  placeholder="Enter exam name"
+                  value={formData.examName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                  <button
-                    onClick={() => handleDelete(exam._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+              <div className="form-group">
+                <label htmlFor="subjectId">
+                  Subject ID
+                </label>
+
+                <input
+                  id="subjectId"
+                  name="subjectId"
+                  placeholder="Enter subject ID"
+                  value={formData.subjectId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="examDate">
+                  Exam Date
+                </label>
+
+                <input
+                  id="examDate"
+                  name="examDate"
+                  type="date"
+                  value={formData.examDate}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="maxMarks">
+                  Maximum Marks
+                </label>
+
+                <input
+                  id="maxMarks"
+                  name="maxMarks"
+                  type="number"
+                  min="1"
+                  placeholder="Enter maximum marks"
+                  value={formData.maxMarks}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+            </div>
+
+            <div className="exam-form-actions">
+
+              {editingExam && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingExam
+                  ? "Update Exam"
+                  : "Add Exam"}
+              </button>
+
+            </div>
+
+          </form>
+        </div>
+
+        <div className="exam-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Exam Records</h3>
+              <p>
+                View and manage all examination records.
+              </p>
+            </div>
+          </div>
+
+          {exams.length === 0 ? (
+            <div className="exam-empty-state">
+              <h4>No exams found</h4>
+              <p>
+                Add your first exam using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="exam-table-wrapper">
+
+              <table className="exam-table">
+
+                <thead>
+                  <tr>
+                    <th>Exam ID</th>
+                    <th>Exam Name</th>
+                    <th>Subject ID</th>
+                    <th>Exam Date</th>
+                    <th>Max Marks</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {exams.map((exam) => (
+                    <tr key={exam._id}>
+
+                      <td className="exam-id">
+                        {exam.examId}
+                      </td>
+
+                      <td className="exam-name">
+                        {exam.examName}
+                      </td>
+
+                      <td>
+                        {exam.subjectId}
+                      </td>
+
+                      <td>
+                        {exam.examDate
+                          ? exam.examDate.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        <span className="max-marks-badge">
+                          {exam.maxMarks}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="exam-actions">
+
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(exam)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(exam._id)
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
     </main>
   );
 };
