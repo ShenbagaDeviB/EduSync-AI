@@ -19,7 +19,27 @@ const AICommandCenter = () => {
         command
       });
 
-      setResponse(result.data.message);
+      if(result.data.tool === "get_students") {
+        setResponse(
+          result.data.data
+            .map(
+              (student) =>
+                `${student.studentId} - ${student.name} - ${student.course}`
+            )
+            .join("\n")
+        );
+      } else if (result.data.tool === "get_attendance") {
+        setResponse(
+          result.data.data
+            .map(
+              (record) =>
+                `${record.studentId} - ${record.subjectId} - ${record.status}`
+            )
+            .join("\n")
+        );
+      } else {
+        setResponse(result.data.message || "No response received");
+      }
     } catch (error) {
       setResponse(
         error.response?.data?.message ||
