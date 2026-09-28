@@ -21,38 +21,72 @@ const FacultyProfile = () => {
   }, []);
 
   return (
-    <main className="dashboard">
-      <h2>Faculty Profile</h2>
+    <main className="dashboard faculty-profile-page">
+      <div className="faculty-profile-container">
 
-      {!faculty ? (
-        <p>No faculty profile found.</p>
-      ) : (
-        <div
-          className="dashboard-card"
-          style={{
-            maxWidth: "700px",
-            marginTop: "20px"
-          }}
-        >
-          <h3>{faculty.name}</h3>
-
-          <p>
-            <strong>Faculty ID:</strong> {faculty.facultyId}
-          </p>
-
-          <p>
-            <strong>Email:</strong> {faculty.email}
-          </p>
-
-          <p>
-            <strong>Department:</strong> {faculty.department}
-          </p>
-
-          <p>
-            <strong>Designation:</strong> {faculty.designation}
-          </p>
+        <div className="faculty-profile-header">
+          <div>
+            <h2>Faculty Profile</h2>
+            <p>
+              View faculty information and professional details.
+            </p>
+          </div>
         </div>
-      )}
+
+        {!faculty ? (
+          <div className="faculty-profile-empty-state">
+            <h4>No faculty profile found</h4>
+            <p>
+              Faculty profile information is currently unavailable.
+            </p>
+          </div>
+        ) : (
+          <div className="faculty-profile-card">
+
+            <div className="faculty-profile-top">
+              <div className="faculty-avatar">
+                {faculty.name?.charAt(0).toUpperCase()}
+              </div>
+
+              <div>
+                <h3>{faculty.name}</h3>
+
+                <span className="faculty-profile-designation">
+                  {faculty.designation}
+                </span>
+              </div>
+            </div>
+
+            <div className="faculty-profile-divider" />
+
+            <div className="faculty-profile-grid">
+
+              <div className="faculty-profile-item">
+                <span>Faculty ID</span>
+                <strong>{faculty.facultyId}</strong>
+              </div>
+
+              <div className="faculty-profile-item">
+                <span>Email</span>
+                <strong>{faculty.email}</strong>
+              </div>
+
+              <div className="faculty-profile-item">
+                <span>Department</span>
+                <strong>{faculty.department}</strong>
+              </div>
+
+              <div className="faculty-profile-item">
+                <span>Designation</span>
+                <strong>{faculty.designation}</strong>
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+      </div>
     </main>
   );
 };
