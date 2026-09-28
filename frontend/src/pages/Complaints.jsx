@@ -9,7 +9,7 @@ const initialForm = {
   description: "",
   priority: "Medium",
   status: "Submitted",
-  resolution: ""
+  resolution: "",
 };
 
 const Complaints = () => {
@@ -36,7 +36,7 @@ const Complaints = () => {
   const handleChange = (e) => {
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -62,8 +62,8 @@ const Complaints = () => {
 
       alert(
         error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Failed to save complaint"
+          error.response?.data?.message ||
+          "Failed to save complaint"
       );
     }
   };
@@ -77,7 +77,7 @@ const Complaints = () => {
       description: complaint.description || "",
       priority: complaint.priority || "Medium",
       status: complaint.status || "Submitted",
-      resolution: complaint.resolution || ""
+      resolution: complaint.resolution || "",
     });
 
     setEditingId(complaint._id);
@@ -101,8 +101,8 @@ const Complaints = () => {
 
       alert(
         error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Failed to delete complaint"
+          error.response?.data?.message ||
+          "Failed to delete complaint"
       );
     }
   };
@@ -113,223 +113,381 @@ const Complaints = () => {
   };
 
   return (
-    <main className="dashboard">
-      <h2>Complaints</h2>
+    <main className="dashboard complaints-page">
+      <div className="complaints-container">
 
-      {/* Complaint Form */}
+        {/* Header */}
 
-      <div
-        className="dashboard-card"
-        style={{
-          maxWidth: "800px",
-          marginTop: "20px"
-        }}
-      >
-        <h3>
-          {editingId ? "Edit Complaint" : "Create Complaint"}
-        </h3>
+        <div className="complaints-header">
+          <div>
+            <h2>Complaints</h2>
+            <p>
+              Create, track, and manage institutional complaints.
+            </p>
+          </div>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="complaintId"
-            placeholder="Complaint ID"
-            value={form.complaintId}
-            onChange={handleChange}
-            required
-          />
+          <div className="complaints-count">
+            <strong>{complaints.length}</strong>
+            <span>Total Complaints</span>
+          </div>
+        </div>
 
-          <br />
-          <br />
+        {/* Form */}
 
-          <input
-            type="text"
-            name="submittedBy"
-            placeholder="Submitted By"
-            value={form.submittedBy}
-            onChange={handleChange}
-            required
-          />
+        <div className="complaint-form-card">
 
-          <br />
-          <br />
-
-          <select
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Category</option>
-            <option value="Academic">Academic</option>
-            <option value="Faculty">Faculty</option>
-            <option value="Infrastructure">
-              Infrastructure
-            </option>
-            <option value="Hostel">Hostel</option>
-            <option value="Library">Library</option>
-            <option value="Transport">Transport</option>
-            <option value="Other">Other</option>
-          </select>
-
-          <br />
-          <br />
-
-          <input
-            type="text"
-            name="subject"
-            placeholder="Subject"
-            value={form.subject}
-            onChange={handleChange}
-            required
-          />
-
-          <br />
-          <br />
-
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={form.description}
-            onChange={handleChange}
-            rows="5"
-            required
-          />
-
-          <br />
-          <br />
-
-          <select
-            name="priority"
-            value={form.priority}
-            onChange={handleChange}
-          >
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Critical">Critical</option>
-          </select>
-
-          <br />
-          <br />
-
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-          >
-            <option value="Submitted">Submitted</option>
-            <option value="Under Review">Under Review</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Resolved">Resolved</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-
-          <br />
-          <br />
-
-          <textarea
-            name="resolution"
-            placeholder="Resolution"
-            value={form.resolution}
-            onChange={handleChange}
-            rows="4"
-          />
-
-          <br />
-          <br />
-
-          <button type="submit">
-            {editingId
-              ? "Update Complaint"
-              : "Add Complaint"}
-          </button>
-
-          {editingId && (
-            <button
-              type="button"
-              onClick={handleCancel}
-              style={{ marginLeft: "10px" }}
-            >
-              Cancel
-            </button>
-          )}
-        </form>
-      </div>
-
-      {/* Complaint List */}
-
-      <div style={{ marginTop: "30px" }}>
-        <h3>Complaint List</h3>
-
-        {loading ? (
-          <p>Loading complaints...</p>
-        ) : complaints.length === 0 ? (
-          <p>No complaints found.</p>
-        ) : (
-          complaints.map((complaint) => (
-            <div
-              className="dashboard-card"
-              key={complaint._id}
-              style={{
-                marginTop: "15px",
-                maxWidth: "800px"
-              }}
-            >
-              <h3>{complaint.subject}</h3>
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingId
+                  ? "Edit Complaint"
+                  : "Create Complaint"}
+              </h3>
 
               <p>
-                <strong>Complaint ID:</strong>{" "}
-                {complaint.complaintId}
+                {editingId
+                  ? "Update the complaint details below."
+                  : "Enter the details to create a complaint."}
               </p>
-
-              <p>
-                <strong>Submitted By:</strong>{" "}
-                {complaint.submittedBy}
-              </p>
-
-              <p>
-                <strong>Category:</strong>{" "}
-                {complaint.category}
-              </p>
-
-              <p>
-                <strong>Priority:</strong>{" "}
-                {complaint.priority}
-              </p>
-
-              <p>
-                <strong>Status:</strong>{" "}
-                {complaint.status}
-              </p>
-
-              <p>
-                <strong>Description:</strong>{" "}
-                {complaint.description}
-              </p>
-
-              <p>
-                <strong>Resolution:</strong>{" "}
-                {complaint.resolution || "Not resolved"}
-              </p>
-
-              <button
-                onClick={() => handleEdit(complaint)}
-              >
-                Edit
-              </button>
-
-              <button
-                onClick={() =>
-                  handleDelete(complaint._id)
-                }
-                style={{ marginLeft: "10px" }}
-              >
-                Delete
-              </button>
             </div>
-          ))
-        )}
+          </div>
+
+          <form onSubmit={handleSubmit}>
+
+            <div className="complaint-form-grid">
+
+              <div className="form-group">
+                <label htmlFor="complaintId">
+                  Complaint ID
+                </label>
+
+                <input
+                  id="complaintId"
+                  type="text"
+                  name="complaintId"
+                  placeholder="Enter complaint ID"
+                  value={form.complaintId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="submittedBy">
+                  Submitted By
+                </label>
+
+                <input
+                  id="submittedBy"
+                  type="text"
+                  name="submittedBy"
+                  placeholder="Enter submitter"
+                  value={form.submittedBy}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="category">
+                  Category
+                </label>
+
+                <select
+                  id="category"
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">
+                    Select Category
+                  </option>
+                  <option value="Academic">
+                    Academic
+                  </option>
+                  <option value="Faculty">
+                    Faculty
+                  </option>
+                  <option value="Infrastructure">
+                    Infrastructure
+                  </option>
+                  <option value="Hostel">
+                    Hostel
+                  </option>
+                  <option value="Library">
+                    Library
+                  </option>
+                  <option value="Transport">
+                    Transport
+                  </option>
+                  <option value="Other">
+                    Other
+                  </option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="subject">
+                  Subject
+                </label>
+
+                <input
+                  id="subject"
+                  type="text"
+                  name="subject"
+                  placeholder="Enter complaint subject"
+                  value={form.subject}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group form-group-full">
+                <label htmlFor="description">
+                  Description
+                </label>
+
+                <textarea
+                  id="description"
+                  name="description"
+                  placeholder="Describe the complaint"
+                  value={form.description}
+                  onChange={handleChange}
+                  rows="4"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="priority">
+                  Priority
+                </label>
+
+                <select
+                  id="priority"
+                  name="priority"
+                  value={form.priority}
+                  onChange={handleChange}
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">
+                    Critical
+                  </option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="status">
+                  Status
+                </label>
+
+                <select
+                  id="status"
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                >
+                  <option value="Submitted">
+                    Submitted
+                  </option>
+                  <option value="Under Review">
+                    Under Review
+                  </option>
+                  <option value="In Progress">
+                    In Progress
+                  </option>
+                  <option value="Resolved">
+                    Resolved
+                  </option>
+                  <option value="Rejected">
+                    Rejected
+                  </option>
+                </select>
+              </div>
+
+              <div className="form-group form-group-full">
+                <label htmlFor="resolution">
+                  Resolution
+                </label>
+
+                <textarea
+                  id="resolution"
+                  name="resolution"
+                  placeholder="Enter resolution if available"
+                  value={form.resolution}
+                  onChange={handleChange}
+                  rows="3"
+                />
+              </div>
+
+            </div>
+
+            <div className="complaint-form-actions">
+
+              {editingId && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingId
+                  ? "Update Complaint"
+                  : "Add Complaint"}
+              </button>
+
+            </div>
+
+          </form>
+        </div>
+
+        {/* Complaint Records */}
+
+        <div className="complaint-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Complaint Records</h3>
+              <p>
+                View and manage submitted complaints.
+              </p>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="complaint-empty-state">
+              <p>Loading complaints...</p>
+            </div>
+          ) : complaints.length === 0 ? (
+            <div className="complaint-empty-state">
+              <h4>No complaints found</h4>
+              <p>
+                Create your first complaint using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="complaint-table-wrapper">
+
+              <table className="complaint-table">
+
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Subject</th>
+                    <th>Submitted By</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                    <th>Resolution</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {complaints.map((complaint) => (
+                    <tr key={complaint._id}>
+
+                      <td className="complaint-id">
+                        {complaint.complaintId}
+                      </td>
+
+                      <td className="complaint-subject">
+                        {complaint.subject}
+                      </td>
+
+                      <td>
+                        {complaint.submittedBy}
+                      </td>
+
+                      <td>
+                        <span className="complaint-category-badge">
+                          {complaint.category}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`complaint-priority-badge priority-${complaint.priority
+                            ?.toLowerCase()
+                            .replace(" ", "-")}`}
+                        >
+                          {complaint.priority}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`complaint-status-badge status-${complaint.status
+                            ?.toLowerCase()
+                            .replaceAll(" ", "-")}`}
+                        >
+                          {complaint.status}
+                        </span>
+                      </td>
+
+                      <td className="complaint-description">
+                        {complaint.description}
+                      </td>
+
+                      <td className="complaint-resolution">
+                        {complaint.resolution ||
+                          "Not resolved"}
+                      </td>
+
+                      <td>
+
+                        <div className="complaint-actions">
+
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(complaint)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(
+                                complaint._id
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </div>
+
       </div>
     </main>
   );

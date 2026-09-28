@@ -13,7 +13,7 @@ const Announcements = () => {
     targetAudience: "All",
     publishDate: "",
     expiryDate: "",
-    status: "Draft"
+    status: "Draft",
   });
 
   const fetchAnnouncements = async () => {
@@ -32,7 +32,7 @@ const Announcements = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -45,8 +45,10 @@ const Announcements = () => {
       targetAudience: "All",
       publishDate: "",
       expiryDate: "",
-      status: "Draft"
+      status: "Draft",
     });
+
+    setEditingAnnouncement(null);
   };
 
   const handleSubmit = async (e) => {
@@ -60,7 +62,7 @@ const Announcements = () => {
           : undefined,
         expiryDate: formData.expiryDate
           ? new Date(formData.expiryDate)
-          : undefined
+          : undefined,
       };
 
       if (editingAnnouncement) {
@@ -70,9 +72,9 @@ const Announcements = () => {
         );
 
         alert("Announcement updated successfully");
-        setEditingAnnouncement(null);
       } else {
         await api.post("/announcements", data);
+
         alert("Announcement added successfully");
       }
 
@@ -81,7 +83,7 @@ const Announcements = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save announcement"
+          "Failed to save announcement"
       );
     }
   };
@@ -101,7 +103,7 @@ const Announcements = () => {
       expiryDate: announcement.expiryDate
         ? announcement.expiryDate.split("T")[0]
         : "",
-      status: announcement.status
+      status: announcement.status,
     });
   };
 
@@ -123,156 +125,311 @@ const Announcements = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete announcement"
+          "Failed to delete announcement"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Announcements</h2>
+    <main className="dashboard announcements-page">
+      <div className="announcements-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="announcementId"
-          placeholder="Announcement ID"
-          value={formData.announcementId}
-          onChange={handleChange}
-          required
-        />
+        {/* Header */}
+        <div className="announcements-header">
+          <div>
+            <h2>Announcements</h2>
+            <p>
+              Create and manage announcements for students,
+              faculty, and staff.
+            </p>
+          </div>
 
-        <input
-          name="title"
-          placeholder="Title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
+          <div className="announcement-count">
+            <strong>{announcements.length}</strong>
+            <span>Total Announcements</span>
+          </div>
+        </div>
 
-        <textarea
-          name="message"
-          placeholder="Message"
-          value={formData.message}
-          onChange={handleChange}
-          required
-        />
+        {/* Form */}
+        <div className="announcement-form-card">
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingAnnouncement
+                  ? "Edit Announcement"
+                  : "Create Announcement"}
+              </h3>
 
-        <input
-          name="postedBy"
-          placeholder="Posted By"
-          value={formData.postedBy}
-          onChange={handleChange}
-          required
-        />
+              <p>
+                {editingAnnouncement
+                  ? "Update the announcement details below."
+                  : "Enter the details to create a new announcement."}
+              </p>
+            </div>
+          </div>
 
-        <select
-          name="targetAudience"
-          value={formData.targetAudience}
-          onChange={handleChange}
-          required
-        >
-          <option value="All">All</option>
-          <option value="Students">Students</option>
-          <option value="Faculty">Faculty</option>
-          <option value="Staff">Staff</option>
-        </select>
+          <form onSubmit={handleSubmit}>
+            <div className="announcement-form-grid">
 
-        <input
-          name="publishDate"
-          type="date"
-          value={formData.publishDate}
-          onChange={handleChange}
-        />
+              <div className="form-group">
+                <label htmlFor="announcementId">
+                  Announcement ID
+                </label>
 
-        <input
-          name="expiryDate"
-          type="date"
-          value={formData.expiryDate}
-          onChange={handleChange}
-        />
+                <input
+                  id="announcementId"
+                  name="announcementId"
+                  placeholder="Enter announcement ID"
+                  value={formData.announcementId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          required
-        >
-          <option value="Draft">Draft</option>
-          <option value="Published">Published</option>
-          <option value="Expired">Expired</option>
-        </select>
+              <div className="form-group">
+                <label htmlFor="title">Title</label>
 
-        <button type="submit">
-          {editingAnnouncement
-            ? "Update Announcement"
-            : "Add Announcement"}
-        </button>
-      </form>
+                <input
+                  id="title"
+                  name="title"
+                  placeholder="Enter announcement title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      <hr />
+              <div className="form-group form-group-full">
+                <label htmlFor="message">Message</label>
 
-      <h3>Announcement Records</h3>
+                <textarea
+                  id="message"
+                  name="message"
+                  placeholder="Enter announcement message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows={4}
+                  required
+                />
+              </div>
 
-      {announcements.length === 0 ? (
-        <p>No announcements found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Announcement ID</th>
-              <th>Title</th>
-              <th>Message</th>
-              <th>Posted By</th>
-              <th>Audience</th>
-              <th>Publish Date</th>
-              <th>Expiry Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+              <div className="form-group">
+                <label htmlFor="postedBy">Posted By</label>
 
-          <tbody>
-            {announcements.map((announcement) => (
-              <tr key={announcement._id}>
-                <td>{announcement.announcementId}</td>
-                <td>{announcement.title}</td>
-                <td>{announcement.message}</td>
-                <td>{announcement.postedBy}</td>
-                <td>{announcement.targetAudience}</td>
-                <td>
-                  {announcement.publishDate
-                    ? announcement.publishDate.split("T")[0]
-                    : ""}
-                </td>
-                <td>
-                  {announcement.expiryDate
-                    ? announcement.expiryDate.split("T")[0]
-                    : ""}
-                </td>
-                <td>{announcement.status}</td>
+                <input
+                  id="postedBy"
+                  name="postedBy"
+                  placeholder="Enter poster name"
+                  value={formData.postedBy}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                <td>
-                  <button
-                    onClick={() =>
-                      handleEdit(announcement)
-                    }
-                  >
-                    Edit
-                  </button>
+              <div className="form-group">
+                <label htmlFor="targetAudience">
+                  Target Audience
+                </label>
 
-                  <button
-                    onClick={() =>
-                      handleDelete(announcement._id)
-                    }
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                <select
+                  id="targetAudience"
+                  name="targetAudience"
+                  value={formData.targetAudience}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="All">All</option>
+                  <option value="Students">Students</option>
+                  <option value="Faculty">Faculty</option>
+                  <option value="Staff">Staff</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="publishDate">
+                  Publish Date
+                </label>
+
+                <input
+                  id="publishDate"
+                  name="publishDate"
+                  type="date"
+                  value={formData.publishDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="expiryDate">
+                  Expiry Date
+                </label>
+
+                <input
+                  id="expiryDate"
+                  name="expiryDate"
+                  type="date"
+                  value={formData.expiryDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="status">Status</label>
+
+                <select
+                  id="status"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Draft">Draft</option>
+                  <option value="Published">Published</option>
+                  <option value="Expired">Expired</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="announcement-form-actions">
+              {editingAnnouncement && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingAnnouncement
+                  ? "Update Announcement"
+                  : "Add Announcement"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Records */}
+        <div className="announcement-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Announcement Records</h3>
+              <p>
+                View and manage all announcements.
+              </p>
+            </div>
+          </div>
+
+          {announcements.length === 0 ? (
+            <div className="announcement-empty-state">
+              <h4>No announcements found</h4>
+              <p>
+                Create your first announcement using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="announcement-table-wrapper">
+              <table className="announcement-table">
+                <thead>
+                  <tr>
+                    <th>Announcement ID</th>
+                    <th>Title</th>
+                    <th>Message</th>
+                    <th>Posted By</th>
+                    <th>Audience</th>
+                    <th>Publish Date</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {announcements.map((announcement) => (
+                    <tr key={announcement._id}>
+
+                      <td>
+                        {announcement.announcementId}
+                      </td>
+
+                      <td className="announcement-title">
+                        {announcement.title}
+                      </td>
+
+                      <td className="announcement-message">
+                        {announcement.message}
+                      </td>
+
+                      <td>
+                        {announcement.postedBy}
+                      </td>
+
+                      <td>
+                        <span className="audience-badge">
+                          {announcement.targetAudience}
+                        </span>
+                      </td>
+
+                      <td>
+                        {announcement.publishDate
+                          ? announcement.publishDate.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        {announcement.expiryDate
+                          ? announcement.expiryDate.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`status-badge status-${announcement.status.toLowerCase()}`}
+                        >
+                          {announcement.status}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="announcement-actions">
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(announcement)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(
+                                announcement._id
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+      </div>
     </main>
   );
 };
