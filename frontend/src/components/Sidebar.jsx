@@ -1,159 +1,350 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
+  const linkClass = ({ isActive }) =>
+    `sidebar-link ${isActive ? "sidebar-link-active" : ""}`;
+
   return (
     <aside className="sidebar">
-      <h2>EduERP</h2>
+      <div className="sidebar-brand">
+        <h2>EduERP</h2>
+        <span>Educational ERP</span>
+      </div>
 
-      <nav>
-        <ul>
+      <nav className="sidebar-nav">
 
-          {/* Dashboard */}
-          <li>
-            <Link to="/">Dashboard</Link>
-          </li>
+        {/* Overview */}
 
-          {/* Student Management */}
-          <li>
-            <Link to="/students">Students</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Overview
+          </span>
 
-          <li>
-            <Link to="/student-profile">Student Profile</Link>
-          </li>
+          <NavLink to="/" className={linkClass}>
+            Dashboard
+          </NavLink>
+        </div>
 
-          {/* Faculty Management */}
-          <li>
-            <Link to="/faculty">Faculty</Link>
-          </li>
+        {/* Students */}
 
-          <li>
-            <Link to="/faculty-profile">Faculty Profile</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Students
+          </span>
 
-          {/* Academic Management */}
-          <li>
-            <Link to="/departments">Departments</Link>
-          </li>
+          <NavLink
+            to="/students"
+            className={linkClass}
+          >
+            Students
+          </NavLink>
 
-          <li>
-            <Link to="/courses">Courses</Link>
-          </li>
+          <NavLink
+            to="/student-profile"
+            className={linkClass}
+          >
+            Student Profile
+          </NavLink>
+        </div>
 
-          <li>
-            <Link to="/subjects">Subjects</Link>
-          </li>
+        {/* Faculty */}
 
-          <li>
-            <Link to="/enrollments">Enrollments</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Faculty
+          </span>
 
-          {/* Academic Operations */}
-          <li>
-            <Link to="/attendance">Attendance</Link>
-          </li>
+          <NavLink
+            to="/faculty"
+            className={linkClass}
+          >
+            Faculty
+          </NavLink>
 
-          <li>
-            <Link to="/timetable">Timetable</Link>
-          </li>
+          <NavLink
+            to="/faculty-profile"
+            className={linkClass}
+          >
+            Faculty Profile
+          </NavLink>
+        </div>
 
-          <li>
-            <Link to="/exams">Exams</Link>
-          </li>
+        {/* Academics */}
 
-          <li>
-            <Link to="/results">Results</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Academics
+          </span>
 
-          {/* Finance */}
-          <li>
-            <Link to="/fees">Fees</Link>
-          </li>
+          <NavLink
+            to="/departments"
+            className={linkClass}
+          >
+            Departments
+          </NavLink>
 
-          {/* Library */}
-          <li>
-            <Link to="/library">Library</Link>
-          </li>
+          <NavLink
+            to="/courses"
+            className={linkClass}
+          >
+            Courses
+          </NavLink>
 
-          <li>
-            <Link to="/library-issues">Library Issues</Link>
-          </li>
+          <NavLink
+            to="/subjects"
+            className={linkClass}
+          >
+            Subjects
+          </NavLink>
 
-          {/* Hostel */}
-          <li>
-            <Link to="/hostel">Hostel</Link>
-          </li>
+          <NavLink
+            to="/enrollments"
+            className={linkClass}
+          >
+            Enrollments
+          </NavLink>
+        </div>
 
-          <li>
-            <Link to="/hostel-rooms">Hostel Rooms</Link>
-          </li>
+        {/* Academic Operations */}
 
-          <li>
-            <Link to="/hostel-allocations">Hostel Allocations</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Academic Operations
+          </span>
 
-          {/* Events */}
-          <li>
-            <Link to="/events">Events</Link>
-          </li>
+          <NavLink
+            to="/attendance"
+            className={linkClass}
+          >
+            Attendance
+          </NavLink>
 
-          <li>
-            <Link to="/event-registrations">Event Registrations</Link>
-          </li>
+          <NavLink
+            to="/timetable"
+            className={linkClass}
+          >
+            Timetable
+          </NavLink>
 
-          {/* Communication */}
-          <li>
-            <Link to="/announcements">Announcements</Link>
-          </li>
+          <NavLink
+            to="/exams"
+            className={linkClass}
+          >
+            Exams
+          </NavLink>
 
-          <li>
-            <Link to="/notifications">Notifications</Link>
-          </li>
+          <NavLink
+            to="/results"
+            className={linkClass}
+          >
+            Results
+          </NavLink>
+        </div>
 
-          <li>
-            <Link to="/documents">Documents</Link>
-          </li>
+        {/* Finance */}
 
-          {/* Staff Management */}
-          <li>
-            <Link to="/leave">Leave</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Finance
+          </span>
 
-          <li>
-            <Link to="/payroll">Payroll</Link>
-          </li>
+          <NavLink
+            to="/fees"
+            className={linkClass}
+          >
+            Fees
+          </NavLink>
+        </div>
 
-          <li>
-            <Link to="/feedback">Feedback</Link>
-          </li>
+        {/* Library */}
 
-          <li>
-            <Link to="/complaints">Complaints</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Library
+          </span>
 
-          {/* Analytics & AI */}
-          <li>
-            <Link to="/reports">Reports</Link>
-          </li>
+          <NavLink
+            to="/library"
+            className={linkClass}
+          >
+            Library
+          </NavLink>
 
-          <li>
-            <Link to="/ai-command-center">AI Command Center</Link>
-          </li>
+          <NavLink
+            to="/library-issues"
+            className={linkClass}
+          >
+            Library Issues
+          </NavLink>
+        </div>
 
-          {/* System */}
-          <li>
-            <Link to="/users">Users</Link>
-          </li>
+        {/* Hostel */}
 
-          <li>
-            <Link to="/profile">Profile</Link>
-          </li>
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Hostel
+          </span>
 
-          <li>
-            <Link to="/settings">Settings</Link>
-          </li>
+          <NavLink
+            to="/hostel"
+            className={linkClass}
+          >
+            Hostel
+          </NavLink>
 
-        </ul>
+          <NavLink
+            to="/hostel-rooms"
+            className={linkClass}
+          >
+            Hostel Rooms
+          </NavLink>
+
+          <NavLink
+            to="/hostel-allocations"
+            className={linkClass}
+          >
+            Hostel Allocations
+          </NavLink>
+        </div>
+
+        {/* Events */}
+
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Events
+          </span>
+
+          <NavLink
+            to="/events"
+            className={linkClass}
+          >
+            Events
+          </NavLink>
+
+          <NavLink
+            to="/event-registrations"
+            className={linkClass}
+          >
+            Event Registrations
+          </NavLink>
+        </div>
+
+        {/* Communication */}
+
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Communication
+          </span>
+
+          <NavLink
+            to="/announcements"
+            className={linkClass}
+          >
+            Announcements
+          </NavLink>
+
+          <NavLink
+            to="/notifications"
+            className={linkClass}
+          >
+            Notifications
+          </NavLink>
+
+          <NavLink
+            to="/documents"
+            className={linkClass}
+          >
+            Documents
+          </NavLink>
+        </div>
+
+        {/* Staff Management */}
+
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Staff Management
+          </span>
+
+          <NavLink
+            to="/leave"
+            className={linkClass}
+          >
+            Leave
+          </NavLink>
+
+          <NavLink
+            to="/payroll"
+            className={linkClass}
+          >
+            Payroll
+          </NavLink>
+
+          <NavLink
+            to="/feedback"
+            className={linkClass}
+          >
+            Feedback
+          </NavLink>
+
+          <NavLink
+            to="/complaints"
+            className={linkClass}
+          >
+            Complaints
+          </NavLink>
+        </div>
+
+        {/* Analytics & AI */}
+
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            Analytics & AI
+          </span>
+
+          <NavLink
+            to="/reports"
+            className={linkClass}
+          >
+            Reports
+          </NavLink>
+
+          <NavLink
+            to="/ai-command-center"
+            className={linkClass}
+          >
+            AI Command Center
+          </NavLink>
+        </div>
+
+        {/* System */}
+
+        <div className="sidebar-section">
+          <span className="sidebar-section-title">
+            System
+          </span>
+
+          <NavLink
+            to="/users"
+            className={linkClass}
+          >
+            Users
+          </NavLink>
+
+          <NavLink
+            to="/profile"
+            className={linkClass}
+          >
+            Profile
+          </NavLink>
+
+          <NavLink
+            to="/settings"
+            className={linkClass}
+          >
+            Settings
+          </NavLink>
+        </div>
+
       </nav>
     </aside>
   );
