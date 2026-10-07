@@ -1,25 +1,30 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialForm = {
+  notificationId: "",
+  recipientId: "",
+  title: "",
+  message: "",
+  type: "Info",
+  isRead: false,
+};
+
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
-  const [editingNotification, setEditingNotification] = useState(null);
-
-  const [formData, setFormData] = useState({
-    notificationId: "",
-    recipientId: "",
-    title: "",
-    message: "",
-    type: "Info",
-    isRead: false
-  });
+  const [editingNotification, setEditingNotification] =
+    useState(null);
+  const [formData, setFormData] = useState(initialForm);
 
   const fetchNotifications = async () => {
     try {
       const response = await api.get("/notifications");
       setNotifications(response.data);
     } catch (error) {
-      console.error("Failed to fetch notifications:", error);
+      console.error(
+        "Failed to fetch notifications:",
+        error
+      );
     }
   };
 
@@ -32,19 +37,13 @@ const Notifications = () => {
 
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
   const resetForm = () => {
-    setFormData({
-      notificationId: "",
-      recipientId: "",
-      title: "",
-      message: "",
-      type: "Info",
-      isRead: false
-    });
+    setFormData(initialForm);
+    setEditingNotification(null);
   };
 
   const handleSubmit = async (e) => {
@@ -53,7 +52,7 @@ const Notifications = () => {
     try {
       const data = {
         ...formData,
-        isRead: Boolean(formData.isRead)
+        isRead: Boolean(formData.isRead),
       };
 
       if (editingNotification) {
@@ -63,7 +62,6 @@ const Notifications = () => {
         );
 
         alert("Notification updated successfully");
-        setEditingNotification(null);
       } else {
         await api.post("/notifications", data);
         alert("Notification added successfully");
@@ -74,7 +72,7 @@ const Notifications = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save notification"
+          "Failed to save notification"
       );
     }
   };
@@ -88,7 +86,7 @@ const Notifications = () => {
       title: notification.title,
       message: notification.message,
       type: notification.type,
-      isRead: notification.isRead
+      isRead: notification.isRead,
     });
   };
 
@@ -110,137 +108,298 @@ const Notifications = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete notification"
+          "Failed to delete notification"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Notifications</h2>
+    <main className="dashboard notifications-page">
+      <div className="notifications-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="notificationId"
-          placeholder="Notification ID"
-          value={formData.notificationId}
-          onChange={handleChange}
-          required
-        />
+        <div className="notifications-header">
+          <div>
+            <h2>Notifications</h2>
+            <p>
+              Manage notifications, messages, and
+              recipient updates.
+            </p>
+          </div>
 
-        <input
-          name="recipientId"
-          placeholder="Recipient ID"
-          value={formData.recipientId}
-          onChange={handleChange}
-          required
-        />
+          <div className="notifications-count">
+            <strong>{notifications.length}</strong>
+            <span>Total Notifications</span>
+          </div>
+        </div>
 
-        <input
-          name="title"
-          placeholder="Title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
+        <div className="notification-form-card">
 
-        <textarea
-          name="message"
-          placeholder="Message"
-          value={formData.message}
-          onChange={handleChange}
-          required
-        />
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingNotification
+                  ? "Edit Notification"
+                  : "Add Notification"}
+              </h3>
 
-        <select
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          required
-        >
-          <option value="Info">Info</option>
-          <option value="Success">Success</option>
-          <option value="Warning">Warning</option>
-          <option value="Alert">Alert</option>
-        </select>
+              <p>
+                {editingNotification
+                  ? "Update the notification details below."
+                  : "Enter the details to create a new notification."}
+              </p>
+            </div>
+          </div>
 
-        <label>
-          <input
-            name="isRead"
-            type="checkbox"
-            checked={formData.isRead}
-            onChange={handleChange}
-          />
-          Read
-        </label>
+          <form onSubmit={handleSubmit}>
 
-        <button type="submit">
-          {editingNotification
-            ? "Update Notification"
-            : "Add Notification"}
-        </button>
-      </form>
+            <div className="notification-form-grid">
 
-      <hr />
+              <div className="form-group">
+                <label htmlFor="notificationId">
+                  Notification ID
+                </label>
 
-      <h3>Notification Records</h3>
+                <input
+                  id="notificationId"
+                  name="notificationId"
+                  placeholder="Enter notification ID"
+                  value={formData.notificationId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      {notifications.length === 0 ? (
-        <p>No notifications found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Notification ID</th>
-              <th>Recipient ID</th>
-              <th>Title</th>
-              <th>Message</th>
-              <th>Type</th>
-              <th>Read</th>
-              <th>Created At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+              <div className="form-group">
+                <label htmlFor="recipientId">
+                  Recipient ID
+                </label>
 
-          <tbody>
-            {notifications.map((notification) => (
-              <tr key={notification._id}>
-                <td>{notification.notificationId}</td>
-                <td>{notification.recipientId}</td>
-                <td>{notification.title}</td>
-                <td>{notification.message}</td>
-                <td>{notification.type}</td>
-                <td>
-                  {notification.isRead ? "Yes" : "No"}
-                </td>
-                <td>
-                  {notification.createdAt
-                    ? notification.createdAt.split("T")[0]
-                    : ""}
-                </td>
+                <input
+                  id="recipientId"
+                  name="recipientId"
+                  placeholder="Enter recipient ID"
+                  value={formData.recipientId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                <td>
-                  <button
-                    onClick={() =>
-                      handleEdit(notification)
-                    }
-                  >
-                    Edit
-                  </button>
+              <div className="form-group">
+                <label htmlFor="title">
+                  Title
+                </label>
 
-                  <button
-                    onClick={() =>
-                      handleDelete(notification._id)
-                    }
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                <input
+                  id="title"
+                  name="title"
+                  placeholder="Enter notification title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="type">
+                  Notification Type
+                </label>
+
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Info">Info</option>
+                  <option value="Success">Success</option>
+                  <option value="Warning">Warning</option>
+                  <option value="Alert">Alert</option>
+                </select>
+              </div>
+
+              <div className="form-group notification-message-group">
+                <label htmlFor="message">
+                  Message
+                </label>
+
+                <textarea
+                  id="message"
+                  name="message"
+                  placeholder="Enter notification message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="notification-read-group">
+                <label className="notification-checkbox">
+                  <input
+                    name="isRead"
+                    type="checkbox"
+                    checked={formData.isRead}
+                    onChange={handleChange}
+                  />
+
+                  <span>
+                    Mark as Read
+                  </span>
+                </label>
+              </div>
+
+            </div>
+
+            <div className="notification-form-actions">
+
+              {editingNotification && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingNotification
+                  ? "Update Notification"
+                  : "Add Notification"}
+              </button>
+
+            </div>
+
+          </form>
+        </div>
+
+        <div className="notification-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Notification Records</h3>
+              <p>
+                View and manage all notification records.
+              </p>
+            </div>
+          </div>
+
+          {notifications.length === 0 ? (
+            <div className="notification-empty-state">
+              <h4>No notifications found</h4>
+              <p>
+                Add your first notification using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="notification-table-wrapper">
+
+              <table className="notification-table">
+
+                <thead>
+                  <tr>
+                    <th>Notification ID</th>
+                    <th>Recipient ID</th>
+                    <th>Title</th>
+                    <th>Message</th>
+                    <th>Type</th>
+                    <th>Read</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {notifications.map((notification) => (
+                    <tr key={notification._id}>
+
+                      <td className="notification-id">
+                        {notification.notificationId}
+                      </td>
+
+                      <td className="notification-recipient">
+                        {notification.recipientId}
+                      </td>
+
+                      <td className="notification-title">
+                        {notification.title}
+                      </td>
+
+                      <td className="notification-message">
+                        {notification.message}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`notification-type-badge notification-${notification.type?.toLowerCase()}`}
+                        >
+                          {notification.type}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`notification-read-badge ${
+                            notification.isRead
+                              ? "notification-read"
+                              : "notification-unread"
+                          }`}
+                        >
+                          {notification.isRead
+                            ? "Read"
+                            : "Unread"}
+                        </span>
+                      </td>
+
+                      <td>
+                        {notification.createdAt
+                          ? notification.createdAt.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        <div className="notification-actions">
+
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(notification)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(
+                                notification._id
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
     </main>
   );
 };
