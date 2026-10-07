@@ -39,36 +39,80 @@ const Profile = () => {
   }, []);
 
   return (
-    <main className="dashboard">
-      <h2>My Profile</h2>
+    <main className="dashboard profile-page">
+      <div className="profile-container">
 
-      {loading ? (
-        <p>Loading profile...</p>
-      ) : !user ? (
-        <p>Profile not found.</p>
-      ) : (
-        <div
-          className="dashboard-card"
-          style={{
-            maxWidth: "700px",
-            marginTop: "20px"
-          }}
-        >
-          <h3>{user.name}</h3>
-
+        <div className="profile-header">
+          <h2>My Profile</h2>
           <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-
-          <p>
-            <strong>Role:</strong> {user.role}
-          </p>
-
-          <p>
-            <strong>User ID:</strong> {user._id}
+            View your account information and profile details.
           </p>
         </div>
-      )}
+
+        {loading ? (
+          <div className="profile-state">
+            <p>Loading profile...</p>
+          </div>
+        ) : !user ? (
+          <div className="profile-state">
+            <h4>Profile not found</h4>
+            <p>
+              Unable to load your profile information.
+            </p>
+          </div>
+        ) : (
+          <div className="profile-card">
+
+            <div className="profile-top">
+
+              <div className="profile-avatar">
+                {user.name
+                  ? user.name.charAt(0).toUpperCase()
+                  : "U"}
+              </div>
+
+              <div className="profile-identity">
+                <h3>{user.name}</h3>
+
+                <span
+                  className={`profile-role profile-role-${user.role?.toLowerCase()}`}
+                >
+                  {user.role}
+                </span>
+              </div>
+
+            </div>
+
+            <div className="profile-divider" />
+
+            <div className="profile-details">
+
+              <div className="profile-detail-item">
+                <span>Name</span>
+                <strong>{user.name}</strong>
+              </div>
+
+              <div className="profile-detail-item">
+                <span>Email</span>
+                <strong>{user.email}</strong>
+              </div>
+
+              <div className="profile-detail-item">
+                <span>Role</span>
+                <strong>{user.role}</strong>
+              </div>
+
+              <div className="profile-detail-item">
+                <span>User ID</span>
+                <strong>{user._id}</strong>
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+      </div>
     </main>
   );
 };
