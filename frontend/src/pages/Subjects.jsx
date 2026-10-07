@@ -1,24 +1,29 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialFormData = {
+  subjectId: "",
+  subjectName: "",
+  courseId: "",
+  semester: "",
+  credits: "",
+};
+
 const Subjects = () => {
   const [subjects, setSubjects] = useState([]);
   const [editingSubject, setEditingSubject] = useState(null);
 
-  const [formData, setFormData] = useState({
-    subjectId: "",
-    subjectName: "",
-    courseId: "",
-    semester: "",
-    credits: ""
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
   const fetchSubjects = async () => {
     try {
       const response = await api.get("/subjects");
       setSubjects(response.data);
     } catch (error) {
-      console.error("Failed to fetch subjects:", error);
+      console.error(
+        "Failed to fetch subjects:",
+        error
+      );
     }
   };
 
@@ -29,8 +34,13 @@ const Subjects = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setEditingSubject(null);
   };
 
   const handleSubmit = async (e) => {
@@ -40,31 +50,28 @@ const Subjects = () => {
       const data = {
         ...formData,
         semester: Number(formData.semester),
-        credits: Number(formData.credits)
+        credits: Number(formData.credits),
       };
 
       if (editingSubject) {
-        await api.put(`/subjects/${editingSubject._id}`, data);
+        await api.put(
+          `/subjects/${editingSubject._id}`,
+          data
+        );
+
         alert("Subject updated successfully");
-        setEditingSubject(null);
       } else {
         await api.post("/subjects", data);
+
         alert("Subject added successfully");
       }
 
-      setFormData({
-        subjectId: "",
-        subjectName: "",
-        courseId: "",
-        semester: "",
-        credits: ""
-      });
-
+      resetForm();
       fetchSubjects();
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save subject"
+          "Failed to save subject"
       );
     }
   };
@@ -77,12 +84,16 @@ const Subjects = () => {
       subjectName: subject.subjectName,
       courseId: subject.courseId,
       semester: subject.semester,
-      credits: subject.credits
+      credits: subject.credits,
     });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this subject?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this subject?"
+      )
+    ) {
       return;
     }
 
@@ -95,105 +106,237 @@ const Subjects = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete subject"
+          "Failed to delete subject"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Subjects</h2>
+    <main className="dashboard subjects-page">
+      <div className="subjects-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="subjectId"
-          placeholder="Subject ID"
-          value={formData.subjectId}
-          onChange={handleChange}
-          required
-        />
+        {/* Header */}
 
-        <input
-          name="subjectName"
-          placeholder="Subject Name"
-          value={formData.subjectName}
-          onChange={handleChange}
-          required
-        />
+        <div className="subjects-header">
+          <div>
+            <h2>Subjects</h2>
+            <p>
+              Manage subjects, semesters, credits, and
+              course associations.
+            </p>
+          </div>
 
-        <input
-          name="courseId"
-          placeholder="Course ID"
-          value={formData.courseId}
-          onChange={handleChange}
-          required
-        />
+          <div className="subjects-count">
+            <strong>{subjects.length}</strong>
+            <span>Total Subjects</span>
+          </div>
+        </div>
 
-        <input
-          name="semester"
-          type="number"
-          placeholder="Semester"
-          value={formData.semester}
-          onChange={handleChange}
-          required
-        />
+        {/* Form */}
 
-        <input
-          name="credits"
-          type="number"
-          placeholder="Credits"
-          value={formData.credits}
-          onChange={handleChange}
-          required
-        />
+        <div className="subjects-form-card">
+          <h3>
+            {editingSubject
+              ? "Update Subject"
+              : "Add Subject"}
+          </h3>
 
-        <button type="submit">
-          {editingSubject ? "Update Subject" : "Add Subject"}
-        </button>
-      </form>
+          <form
+            className="subjects-form"
+            onSubmit={handleSubmit}
+          >
+            <div className="subjects-form-grid">
 
-      <hr />
+              <div className="form-group">
+                <label htmlFor="subjectId">
+                  Subject ID
+                </label>
 
-      <h3>Subject Records</h3>
+                <input
+                  id="subjectId"
+                  name="subjectId"
+                  placeholder="Enter subject ID"
+                  value={formData.subjectId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      {subjects.length === 0 ? (
-        <p>No subjects found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Subject ID</th>
-              <th>Subject Name</th>
-              <th>Course ID</th>
-              <th>Semester</th>
-              <th>Credits</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+              <div className="form-group">
+                <label htmlFor="subjectName">
+                  Subject Name
+                </label>
 
-          <tbody>
-            {subjects.map((subject) => (
-              <tr key={subject._id}>
-                <td>{subject.subjectId}</td>
-                <td>{subject.subjectName}</td>
-                <td>{subject.courseId}</td>
-                <td>{subject.semester}</td>
-                <td>{subject.credits}</td>
+                <input
+                  id="subjectName"
+                  name="subjectName"
+                  placeholder="Enter subject name"
+                  value={formData.subjectName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                <td>
-                  <button onClick={() => handleEdit(subject)}>
-                    Edit
-                  </button>
+              <div className="form-group">
+                <label htmlFor="courseId">
+                  Course ID
+                </label>
 
-                  <button onClick={() => handleDelete(subject._id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                <input
+                  id="courseId"
+                  name="courseId"
+                  placeholder="Enter course ID"
+                  value={formData.courseId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="semester">
+                  Semester
+                </label>
+
+                <input
+                  id="semester"
+                  name="semester"
+                  type="number"
+                  placeholder="Enter semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="credits">
+                  Credits
+                </label>
+
+                <input
+                  id="credits"
+                  name="credits"
+                  type="number"
+                  placeholder="Enter credits"
+                  value={formData.credits}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+            </div>
+
+            <div className="subjects-form-actions">
+              {editingSubject && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingSubject
+                  ? "Update Subject"
+                  : "Add Subject"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Records */}
+
+        <div className="subjects-records-card">
+          <div className="subjects-records-header">
+            <h3>Subject Records</h3>
+          </div>
+
+          {subjects.length === 0 ? (
+            <div className="subjects-empty-state">
+              <h4>No subjects found</h4>
+              <p>
+                Add a subject to start managing subject
+                records.
+              </p>
+            </div>
+          ) : (
+            <div className="subjects-table-wrapper">
+              <table className="subjects-table">
+                <thead>
+                  <tr>
+                    <th>Subject ID</th>
+                    <th>Subject Name</th>
+                    <th>Course ID</th>
+                    <th>Semester</th>
+                    <th>Credits</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {subjects.map((subject) => (
+                    <tr key={subject._id}>
+                      <td className="subject-id">
+                        {subject.subjectId}
+                      </td>
+
+                      <td className="subject-name">
+                        {subject.subjectName}
+                      </td>
+
+                      <td className="subject-course-id">
+                        {subject.courseId}
+                      </td>
+
+                      <td>
+                        <span className="subject-semester-badge">
+                          Semester {subject.semester}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="subject-credits-badge">
+                          {subject.credits} Credits
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="subject-actions">
+                          <button
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(subject)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(
+                                subject._id
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+      </div>
     </main>
   );
 };
