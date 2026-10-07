@@ -11,7 +11,7 @@ const Login = () => {
     try {
       const response = await api.post("/auth/login", {
         email,
-        password
+        password,
       });
 
       localStorage.setItem("token", response.data.token);
@@ -20,39 +20,90 @@ const Login = () => {
       console.log(response.data);
     } catch (error) {
       alert(
-        error.response?.data?.message || "Login failed"
+        error.response?.data?.message ||
+          "Login failed"
       );
     }
   };
 
   return (
-    <div>
-      <h1>Educational ERP Login</h1>
+    <main className="login-page">
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      <div className="login-container">
 
-        <br /><br />
+        <div className="login-card">
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <div className="login-header">
+            <div className="login-logo">
+              ERP
+            </div>
 
-        <br /><br />
+            <h1>Educational ERP</h1>
 
-        <button type="submit">Login</button>
-      </form>
-    </div>
+            <p>
+              Sign in to access your ERP dashboard
+            </p>
+          </div>
+
+          <form
+            className="login-form"
+            onSubmit={handleLogin}
+          >
+
+            <div className="form-group">
+              <label htmlFor="email">
+                Email Address
+              </label>
+
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">
+                Password
+              </label>
+
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="primary-button login-button"
+            >
+              Login
+            </button>
+
+          </form>
+
+          <div className="login-footer">
+            <span>
+              Educational ERP Management System
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
   );
 };
 
