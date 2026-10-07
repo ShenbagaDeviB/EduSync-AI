@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialForm = {
+  hostelId: "",
+  hostelName: "",
+  hostelType: "Boys",
+  address: "",
+  totalRooms: "",
+  totalCapacity: "",
+  wardenName: "",
+  contactNumber: "",
+  status: "Active",
+};
+
 const Hostel = () => {
   const [hostels, setHostels] = useState([]);
   const [editingHostel, setEditingHostel] = useState(null);
-
-  const [formData, setFormData] = useState({
-    hostelId: "",
-    hostelName: "",
-    hostelType: "Boys",
-    address: "",
-    totalRooms: "",
-    totalCapacity: "",
-    wardenName: "",
-    contactNumber: "",
-    status: "Active"
-  });
+  const [formData, setFormData] = useState(initialForm);
 
   const fetchHostels = async () => {
     try {
@@ -33,8 +34,13 @@ const Hostel = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const resetForm = () => {
+    setFormData(initialForm);
+    setEditingHostel(null);
   };
 
   const handleSubmit = async (e) => {
@@ -44,35 +50,27 @@ const Hostel = () => {
       const data = {
         ...formData,
         totalRooms: Number(formData.totalRooms),
-        totalCapacity: Number(formData.totalCapacity)
+        totalCapacity: Number(formData.totalCapacity),
       };
 
       if (editingHostel) {
-        await api.put(`/hostels/${editingHostel._id}`, data);
+        await api.put(
+          `/hostels/${editingHostel._id}`,
+          data
+        );
+
         alert("Hostel updated successfully");
-        setEditingHostel(null);
       } else {
         await api.post("/hostels", data);
         alert("Hostel added successfully");
       }
 
-      setFormData({
-        hostelId: "",
-        hostelName: "",
-        hostelType: "Boys",
-        address: "",
-        totalRooms: "",
-        totalCapacity: "",
-        wardenName: "",
-        contactNumber: "",
-        status: "Active"
-      });
-
+      resetForm();
       fetchHostels();
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save hostel"
+          "Failed to save hostel"
       );
     }
   };
@@ -89,12 +87,16 @@ const Hostel = () => {
       totalCapacity: hostel.totalCapacity,
       wardenName: hostel.wardenName,
       contactNumber: hostel.contactNumber,
-      status: hostel.status
+      status: hostel.status,
     });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this hostel?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this hostel?"
+      )
+    ) {
       return;
     }
 
@@ -107,149 +109,345 @@ const Hostel = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete hostel"
+          "Failed to delete hostel"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Hostels</h2>
+    <main className="dashboard hostel-page">
+      <div className="hostel-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="hostelId"
-          placeholder="Hostel ID"
-          value={formData.hostelId}
-          onChange={handleChange}
-          required
-        />
+        <div className="hostel-header">
+          <div>
+            <h2>Hostels</h2>
+            <p>
+              Manage hostel facilities, capacity, wardens,
+              and operational status.
+            </p>
+          </div>
 
-        <input
-          name="hostelName"
-          placeholder="Hostel Name"
-          value={formData.hostelName}
-          onChange={handleChange}
-          required
-        />
+          <div className="hostel-count">
+            <strong>{hostels.length}</strong>
+            <span>Total Hostels</span>
+          </div>
+        </div>
 
-        <select
-          name="hostelType"
-          value={formData.hostelType}
-          onChange={handleChange}
-          required
-        >
-          <option value="Boys">Boys</option>
-          <option value="Girls">Girls</option>
-        </select>
+        <div className="hostel-form-card">
 
-        <input
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={handleChange}
-          required
-        />
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingHostel
+                  ? "Edit Hostel"
+                  : "Add Hostel"}
+              </h3>
 
-        <input
-          name="totalRooms"
-          type="number"
-          placeholder="Total Rooms"
-          value={formData.totalRooms}
-          onChange={handleChange}
-          required
-        />
+              <p>
+                {editingHostel
+                  ? "Update the hostel details below."
+                  : "Enter the details to create a new hostel."}
+              </p>
+            </div>
+          </div>
 
-        <input
-          name="totalCapacity"
-          type="number"
-          placeholder="Total Capacity"
-          value={formData.totalCapacity}
-          onChange={handleChange}
-          required
-        />
+          <form onSubmit={handleSubmit}>
 
-        <input
-          name="wardenName"
-          placeholder="Warden Name"
-          value={formData.wardenName}
-          onChange={handleChange}
-          required
-        />
+            <div className="hostel-form-grid">
 
-        <input
-          name="contactNumber"
-          placeholder="Contact Number"
-          value={formData.contactNumber}
-          onChange={handleChange}
-          required
-        />
+              <div className="form-group">
+                <label htmlFor="hostelId">
+                  Hostel ID
+                </label>
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          required
-        >
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
+                <input
+                  id="hostelId"
+                  name="hostelId"
+                  placeholder="Enter hostel ID"
+                  value={formData.hostelId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-        <button type="submit">
-          {editingHostel ? "Update Hostel" : "Add Hostel"}
-        </button>
-      </form>
+              <div className="form-group">
+                <label htmlFor="hostelName">
+                  Hostel Name
+                </label>
 
-      <hr />
+                <input
+                  id="hostelName"
+                  name="hostelName"
+                  placeholder="Enter hostel name"
+                  value={formData.hostelName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      <h3>Hostel Records</h3>
+              <div className="form-group">
+                <label htmlFor="hostelType">
+                  Hostel Type
+                </label>
 
-      {hostels.length === 0 ? (
-        <p>No hostels found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Hostel ID</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Address</th>
-              <th>Total Rooms</th>
-              <th>Capacity</th>
-              <th>Warden</th>
-              <th>Contact</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+                <select
+                  id="hostelType"
+                  name="hostelType"
+                  value={formData.hostelType}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Boys">Boys</option>
+                  <option value="Girls">Girls</option>
+                </select>
+              </div>
 
-          <tbody>
-            {hostels.map((hostel) => (
-              <tr key={hostel._id}>
-                <td>{hostel.hostelId}</td>
-                <td>{hostel.hostelName}</td>
-                <td>{hostel.hostelType}</td>
-                <td>{hostel.address}</td>
-                <td>{hostel.totalRooms}</td>
-                <td>{hostel.totalCapacity}</td>
-                <td>{hostel.wardenName}</td>
-                <td>{hostel.contactNumber}</td>
-                <td>{hostel.status}</td>
+              <div className="form-group">
+                <label htmlFor="wardenName">
+                  Warden Name
+                </label>
 
-                <td>
-                  <button onClick={() => handleEdit(hostel)}>
-                    Edit
-                  </button>
+                <input
+                  id="wardenName"
+                  name="wardenName"
+                  placeholder="Enter warden name"
+                  value={formData.wardenName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                  <button onClick={() => handleDelete(hostel._id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+              <div className="form-group">
+                <label htmlFor="contactNumber">
+                  Contact Number
+                </label>
+
+                <input
+                  id="contactNumber"
+                  name="contactNumber"
+                  placeholder="Enter contact number"
+                  value={formData.contactNumber}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="status">
+                  Status
+                </label>
+
+                <select
+                  id="status"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">
+                    Inactive
+                  </option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="totalRooms">
+                  Total Rooms
+                </label>
+
+                <input
+                  id="totalRooms"
+                  name="totalRooms"
+                  type="number"
+                  min="0"
+                  placeholder="Enter total rooms"
+                  value={formData.totalRooms}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="totalCapacity">
+                  Total Capacity
+                </label>
+
+                <input
+                  id="totalCapacity"
+                  name="totalCapacity"
+                  type="number"
+                  min="0"
+                  placeholder="Enter total capacity"
+                  value={formData.totalCapacity}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group hostel-address-group">
+                <label htmlFor="address">
+                  Address
+                </label>
+
+                <textarea
+                  id="address"
+                  name="address"
+                  placeholder="Enter hostel address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+            </div>
+
+            <div className="hostel-form-actions">
+
+              {editingHostel && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingHostel
+                  ? "Update Hostel"
+                  : "Add Hostel"}
+              </button>
+
+            </div>
+
+          </form>
+        </div>
+
+        <div className="hostel-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Hostel Records</h3>
+              <p>
+                View and manage all hostel facilities.
+              </p>
+            </div>
+          </div>
+
+          {hostels.length === 0 ? (
+            <div className="hostel-empty-state">
+              <h4>No hostels found</h4>
+              <p>
+                Add your first hostel using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="hostel-table-wrapper">
+
+              <table className="hostel-table">
+
+                <thead>
+                  <tr>
+                    <th>Hostel ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Address</th>
+                    <th>Rooms</th>
+                    <th>Capacity</th>
+                    <th>Warden</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {hostels.map((hostel) => (
+                    <tr key={hostel._id}>
+
+                      <td className="hostel-id">
+                        {hostel.hostelId}
+                      </td>
+
+                      <td className="hostel-name">
+                        {hostel.hostelName}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`hostel-type-badge hostel-${hostel.hostelType?.toLowerCase()}`}
+                        >
+                          {hostel.hostelType}
+                        </span>
+                      </td>
+
+                      <td className="hostel-address">
+                        {hostel.address}
+                      </td>
+
+                      <td>{hostel.totalRooms}</td>
+
+                      <td>
+                        <span className="hostel-capacity-badge">
+                          {hostel.totalCapacity}
+                        </span>
+                      </td>
+
+                      <td>{hostel.wardenName}</td>
+
+                      <td>{hostel.contactNumber}</td>
+
+                      <td>
+                        <span
+                          className={`hostel-status-badge hostel-${hostel.status?.toLowerCase()}`}
+                        >
+                          {hostel.status}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="hostel-actions">
+
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(hostel)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(hostel._id)
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
     </main>
   );
 };
