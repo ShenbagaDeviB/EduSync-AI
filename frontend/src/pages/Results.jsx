@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialFormData = {
+  resultId: "",
+  studentId: "",
+  examId: "",
+  marksObtained: "",
+  grade: "",
+};
+
 const Results = () => {
   const [results, setResults] = useState([]);
   const [editingResult, setEditingResult] = useState(null);
 
-  const [formData, setFormData] = useState({
-    resultId: "",
-    studentId: "",
-    examId: "",
-    marksObtained: "",
-    grade: ""
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
   const fetchResults = async () => {
     try {
@@ -29,8 +31,13 @@ const Results = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setEditingResult(null);
   };
 
   const handleSubmit = async (e) => {
@@ -39,7 +46,7 @@ const Results = () => {
     try {
       const data = {
         ...formData,
-        marksObtained: Number(formData.marksObtained)
+        marksObtained: Number(formData.marksObtained),
       };
 
       if (editingResult) {
@@ -52,19 +59,12 @@ const Results = () => {
         alert("Result added successfully");
       }
 
-      setFormData({
-        resultId: "",
-        studentId: "",
-        examId: "",
-        marksObtained: "",
-        grade: ""
-      });
-
+      resetForm();
       fetchResults();
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save result"
+          "Failed to save result"
       );
     }
   };
@@ -77,12 +77,16 @@ const Results = () => {
       studentId: result.studentId,
       examId: result.examId,
       marksObtained: result.marksObtained,
-      grade: result.grade
+      grade: result.grade,
     });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this result?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this result?"
+      )
+    ) {
       return;
     }
 
@@ -95,108 +99,232 @@ const Results = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete result"
+          "Failed to delete result"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Results</h2>
+    <main className="dashboard results-page">
+      <div className="results-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="resultId"
-          placeholder="Result ID"
-          value={formData.resultId}
-          onChange={handleChange}
-          required
-        />
+        {/* Header */}
 
-        <input
-          name="studentId"
-          placeholder="Student ID"
-          value={formData.studentId}
-          onChange={handleChange}
-          required
-        />
+        <div className="results-header">
+          <div>
+            <h2>Results</h2>
+            <p>
+              Manage student examination results and
+              academic performance records.
+            </p>
+          </div>
 
-        <input
-          name="examId"
-          placeholder="Exam ID"
-          value={formData.examId}
-          onChange={handleChange}
-          required
-        />
+          <div className="results-count">
+            <strong>{results.length}</strong>
+            <span>Total Results</span>
+          </div>
+        </div>
 
-        <input
-          name="marksObtained"
-          type="number"
-          placeholder="Marks Obtained"
-          value={formData.marksObtained}
-          onChange={handleChange}
-          required
-        />
+        {/* Form */}
 
-        <input
-          name="grade"
-          placeholder="Grade"
-          value={formData.grade}
-          onChange={handleChange}
-          required
-        />
+        <div className="results-form-card">
+          <h3>
+            {editingResult
+              ? "Update Result"
+              : "Add Result"}
+          </h3>
 
-        <button type="submit">
-          {editingResult ? "Update Result" : "Add Result"}
-        </button>
-      </form>
+          <form
+            className="results-form"
+            onSubmit={handleSubmit}
+          >
+            <div className="results-form-grid">
 
-      <hr />
+              <div className="form-group">
+                <label htmlFor="resultId">
+                  Result ID
+                </label>
 
-      <h3>Result Records</h3>
+                <input
+                  id="resultId"
+                  name="resultId"
+                  placeholder="Enter result ID"
+                  value={formData.resultId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      {results.length === 0 ? (
-        <p>No results found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Result ID</th>
-              <th>Student ID</th>
-              <th>Exam ID</th>
-              <th>Marks Obtained</th>
-              <th>Grade</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+              <div className="form-group">
+                <label htmlFor="studentId">
+                  Student ID
+                </label>
 
-          <tbody>
-            {results.map((result) => (
-              <tr key={result._id}>
-                <td>{result.resultId}</td>
-                <td>{result.studentId}</td>
-                <td>{result.examId}</td>
-                <td>{result.marksObtained}</td>
-                <td>{result.grade}</td>
+                <input
+                  id="studentId"
+                  name="studentId"
+                  placeholder="Enter student ID"
+                  value={formData.studentId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                <td>
-                  <button
-                    onClick={() => handleEdit(result)}
-                  >
-                    Edit
-                  </button>
+              <div className="form-group">
+                <label htmlFor="examId">
+                  Exam ID
+                </label>
 
-                  <button
-                    onClick={() => handleDelete(result._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+                <input
+                  id="examId"
+                  name="examId"
+                  placeholder="Enter exam ID"
+                  value={formData.examId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="marksObtained">
+                  Marks Obtained
+                </label>
+
+                <input
+                  id="marksObtained"
+                  name="marksObtained"
+                  type="number"
+                  placeholder="Enter marks"
+                  value={formData.marksObtained}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="grade">
+                  Grade
+                </label>
+
+                <input
+                  id="grade"
+                  name="grade"
+                  placeholder="Enter grade"
+                  value={formData.grade}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+            </div>
+
+            <div className="results-form-actions">
+              {editingResult && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingResult
+                  ? "Update Result"
+                  : "Add Result"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Records */}
+
+        <div className="results-records-card">
+          <div className="results-records-header">
+            <h3>Result Records</h3>
+          </div>
+
+          {results.length === 0 ? (
+            <div className="results-empty-state">
+              <h4>No results found</h4>
+              <p>
+                Add a result to start managing academic
+                performance records.
+              </p>
+            </div>
+          ) : (
+            <div className="results-table-wrapper">
+              <table className="results-table">
+                <thead>
+                  <tr>
+                    <th>Result ID</th>
+                    <th>Student ID</th>
+                    <th>Exam ID</th>
+                    <th>Marks Obtained</th>
+                    <th>Grade</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {results.map((result) => (
+                    <tr key={result._id}>
+                      <td className="result-id">
+                        {result.resultId}
+                      </td>
+
+                      <td className="result-student-id">
+                        {result.studentId}
+                      </td>
+
+                      <td className="result-exam-id">
+                        {result.examId}
+                      </td>
+
+                      <td className="result-marks">
+                        {result.marksObtained}
+                      </td>
+
+                      <td>
+                        <span className="result-grade-badge">
+                          {result.grade}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="result-actions">
+                          <button
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(result)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(result._id)
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+      </div>
     </main>
   );
 };
