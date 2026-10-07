@@ -12,7 +12,7 @@ const executeTool = async (toolName, params = {}) => {
             return await getStudents();
 
         case "get_attendance":
-            return await getAttendance();
+            return await getAttendance(params.studentId);
 
         case "get_results":
             return await getResults();

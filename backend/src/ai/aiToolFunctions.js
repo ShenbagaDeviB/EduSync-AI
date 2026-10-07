@@ -11,8 +11,10 @@ const getStudents = async () => {
     return students;
 };
 
-const getAttendance = async () => {
-    const attendance = await Attendance.find();
+const getAttendance = async (studentId = null) => {
+    const filter = studentId ? { studentId } : {};
+
+    const attendance = await Attendance.find(filter);
 
     return attendance;
 };

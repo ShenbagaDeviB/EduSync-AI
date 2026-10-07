@@ -8,9 +8,12 @@ const mockLLM = async (command) => {
     const text = command.toLowerCase();
 
     if (text.includes("attendance")) {
+        const studentId =
+            command.match(/\b\d+[A-Za-z]+\d+\b/i)?.[0];
+
         return {
             intent: "get_attendance",
-            params: {}
+            params: studentId ? { studentId } : {}
         };
     }
 
@@ -23,7 +26,7 @@ const mockLLM = async (command) => {
 
     if (text.includes("result")) {
         const studentId =
-            command.match(/\b[A-Za-z]+\d+\b/)?.[0];
+            command.match(/\b\d+[A-Za-z]+\d+\b/i)?.[0];
 
         if (studentId) {
             return {
