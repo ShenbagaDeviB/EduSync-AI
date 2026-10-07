@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialForm = {
+  bookId: "",
+  title: "",
+  author: "",
+  isbn: "",
+  category: "",
+  totalCopies: "",
+  availableCopies: "",
+};
+
 const Library = () => {
   const [books, setBooks] = useState([]);
   const [editingBook, setEditingBook] = useState(null);
-
-  const [formData, setFormData] = useState({
-    bookId: "",
-    title: "",
-    author: "",
-    isbn: "",
-    category: "",
-    totalCopies: "",
-    availableCopies: ""
-  });
+  const [formData, setFormData] = useState(initialForm);
 
   const fetchBooks = async () => {
     try {
@@ -31,8 +32,13 @@ const Library = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const resetForm = () => {
+    setFormData(initialForm);
+    setEditingBook(null);
   };
 
   const handleSubmit = async (e) => {
@@ -42,33 +48,27 @@ const Library = () => {
       const data = {
         ...formData,
         totalCopies: Number(formData.totalCopies),
-        availableCopies: Number(formData.availableCopies)
+        availableCopies: Number(formData.availableCopies),
       };
 
       if (editingBook) {
-        await api.put(`/library-books/${editingBook._id}`, data);
+        await api.put(
+          `/library-books/${editingBook._id}`,
+          data
+        );
+
         alert("Book updated successfully");
-        setEditingBook(null);
       } else {
         await api.post("/library-books", data);
         alert("Book added successfully");
       }
 
-      setFormData({
-        bookId: "",
-        title: "",
-        author: "",
-        isbn: "",
-        category: "",
-        totalCopies: "",
-        availableCopies: ""
-      });
-
+      resetForm();
       fetchBooks();
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save book"
+          "Failed to save book"
       );
     }
   };
@@ -83,12 +83,16 @@ const Library = () => {
       isbn: book.isbn,
       category: book.category,
       totalCopies: book.totalCopies,
-      availableCopies: book.availableCopies
+      availableCopies: book.availableCopies,
     });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this book?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this book?"
+      )
+    ) {
       return;
     }
 
@@ -101,125 +105,305 @@ const Library = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete book"
+          "Failed to delete book"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Library Books</h2>
+    <main className="dashboard library-page">
+      <div className="library-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="bookId"
-          placeholder="Book ID"
-          value={formData.bookId}
-          onChange={handleChange}
-          required
-        />
+        <div className="library-header">
+          <div>
+            <h2>Library Books</h2>
+            <p>
+              Manage books, authors, categories, and
+              available library copies.
+            </p>
+          </div>
 
-        <input
-          name="title"
-          placeholder="Title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
+          <div className="library-count">
+            <strong>{books.length}</strong>
+            <span>Total Books</span>
+          </div>
+        </div>
 
-        <input
-          name="author"
-          placeholder="Author"
-          value={formData.author}
-          onChange={handleChange}
-          required
-        />
+        <div className="library-form-card">
 
-        <input
-          name="isbn"
-          placeholder="ISBN"
-          value={formData.isbn}
-          onChange={handleChange}
-          required
-        />
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingBook
+                  ? "Edit Book"
+                  : "Add Book"}
+              </h3>
 
-        <input
-          name="category"
-          placeholder="Category"
-          value={formData.category}
-          onChange={handleChange}
-          required
-        />
+              <p>
+                {editingBook
+                  ? "Update the book details below."
+                  : "Enter the details to add a new library book."}
+              </p>
+            </div>
+          </div>
 
-        <input
-          name="totalCopies"
-          type="number"
-          placeholder="Total Copies"
-          value={formData.totalCopies}
-          onChange={handleChange}
-          required
-        />
+          <form onSubmit={handleSubmit}>
 
-        <input
-          name="availableCopies"
-          type="number"
-          placeholder="Available Copies"
-          value={formData.availableCopies}
-          onChange={handleChange}
-          required
-        />
+            <div className="library-form-grid">
 
-        <button type="submit">
-          {editingBook ? "Update Book" : "Add Book"}
-        </button>
-      </form>
+              <div className="form-group">
+                <label htmlFor="bookId">
+                  Book ID
+                </label>
 
-      <hr />
+                <input
+                  id="bookId"
+                  name="bookId"
+                  placeholder="Enter book ID"
+                  value={formData.bookId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      <h3>Library Book Records</h3>
+              <div className="form-group">
+                <label htmlFor="title">
+                  Title
+                </label>
 
-      {books.length === 0 ? (
-        <p>No books found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Book ID</th>
-              <th>Title</th>
-              <th>Author</th>
-              <th>ISBN</th>
-              <th>Category</th>
-              <th>Total Copies</th>
-              <th>Available Copies</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+                <input
+                  id="title"
+                  name="title"
+                  placeholder="Enter book title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          <tbody>
-            {books.map((book) => (
-              <tr key={book._id}>
-                <td>{book.bookId}</td>
-                <td>{book.title}</td>
-                <td>{book.author}</td>
-                <td>{book.isbn}</td>
-                <td>{book.category}</td>
-                <td>{book.totalCopies}</td>
-                <td>{book.availableCopies}</td>
+              <div className="form-group">
+                <label htmlFor="author">
+                  Author
+                </label>
 
-                <td>
-                  <button onClick={() => handleEdit(book)}>
-                    Edit
-                  </button>
+                <input
+                  id="author"
+                  name="author"
+                  placeholder="Enter author name"
+                  value={formData.author}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                  <button onClick={() => handleDelete(book._id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+              <div className="form-group">
+                <label htmlFor="isbn">
+                  ISBN
+                </label>
+
+                <input
+                  id="isbn"
+                  name="isbn"
+                  placeholder="Enter ISBN"
+                  value={formData.isbn}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="category">
+                  Category
+                </label>
+
+                <input
+                  id="category"
+                  name="category"
+                  placeholder="Enter category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="totalCopies">
+                  Total Copies
+                </label>
+
+                <input
+                  id="totalCopies"
+                  name="totalCopies"
+                  type="number"
+                  min="0"
+                  placeholder="Enter total copies"
+                  value={formData.totalCopies}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="availableCopies">
+                  Available Copies
+                </label>
+
+                <input
+                  id="availableCopies"
+                  name="availableCopies"
+                  type="number"
+                  min="0"
+                  placeholder="Enter available copies"
+                  value={formData.availableCopies}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+            </div>
+
+            <div className="library-form-actions">
+
+              {editingBook && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingBook
+                  ? "Update Book"
+                  : "Add Book"}
+              </button>
+
+            </div>
+
+          </form>
+        </div>
+
+        <div className="library-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Library Book Records</h3>
+              <p>
+                View and manage all books in the library.
+              </p>
+            </div>
+          </div>
+
+          {books.length === 0 ? (
+            <div className="library-empty-state">
+              <h4>No books found</h4>
+              <p>
+                Add your first library book using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="library-table-wrapper">
+
+              <table className="library-table">
+
+                <thead>
+                  <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Category</th>
+                    <th>Total Copies</th>
+                    <th>Available</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {books.map((book) => (
+                    <tr key={book._id}>
+
+                      <td className="book-id">
+                        {book.bookId}
+                      </td>
+
+                      <td className="book-title">
+                        {book.title}
+                      </td>
+
+                      <td>{book.author}</td>
+
+                      <td className="book-isbn">
+                        {book.isbn}
+                      </td>
+
+                      <td>
+                        <span className="book-category-badge">
+                          {book.category}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="book-total-badge">
+                          {book.totalCopies}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`book-availability-badge ${
+                            book.availableCopies > 0
+                              ? "book-available"
+                              : "book-unavailable"
+                          }`}
+                        >
+                          {book.availableCopies}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="book-actions">
+
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(book)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(book._id)
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
     </main>
   );
 };

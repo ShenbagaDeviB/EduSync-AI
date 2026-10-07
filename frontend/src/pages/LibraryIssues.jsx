@@ -1,26 +1,30 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
+const initialForm = {
+  issueId: "",
+  bookId: "",
+  studentId: "",
+  issueDate: "",
+  dueDate: "",
+  returnDate: "",
+  status: "Issued",
+};
+
 const LibraryIssues = () => {
   const [issues, setIssues] = useState([]);
   const [editingIssue, setEditingIssue] = useState(null);
-
-  const [formData, setFormData] = useState({
-    issueId: "",
-    bookId: "",
-    studentId: "",
-    issueDate: "",
-    dueDate: "",
-    returnDate: "",
-    status: "Issued"
-  });
+  const [formData, setFormData] = useState(initialForm);
 
   const fetchIssues = async () => {
     try {
       const response = await api.get("/library-issues");
       setIssues(response.data);
     } catch (error) {
-      console.error("Failed to fetch library issues:", error);
+      console.error(
+        "Failed to fetch library issues:",
+        error
+      );
     }
   };
 
@@ -31,8 +35,13 @@ const LibraryIssues = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const resetForm = () => {
+    setFormData(initialForm);
+    setEditingIssue(null);
   };
 
   const handleSubmit = async (e) => {
@@ -41,33 +50,27 @@ const LibraryIssues = () => {
     try {
       const data = {
         ...formData,
-        returnDate: formData.returnDate || undefined
+        returnDate: formData.returnDate || undefined,
       };
 
       if (editingIssue) {
-        await api.put(`/library-issues/${editingIssue._id}`, data);
+        await api.put(
+          `/library-issues/${editingIssue._id}`,
+          data
+        );
+
         alert("Library issue updated successfully");
-        setEditingIssue(null);
       } else {
         await api.post("/library-issues", data);
         alert("Library issue added successfully");
       }
 
-      setFormData({
-        issueId: "",
-        bookId: "",
-        studentId: "",
-        issueDate: "",
-        dueDate: "",
-        returnDate: "",
-        status: "Issued"
-      });
-
+      resetForm();
       fetchIssues();
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to save library issue"
+          "Failed to save library issue"
       );
     }
   };
@@ -79,17 +82,25 @@ const LibraryIssues = () => {
       issueId: issue.issueId,
       bookId: issue.bookId,
       studentId: issue.studentId,
-      issueDate: issue.issueDate.split("T")[0],
-      dueDate: issue.dueDate.split("T")[0],
+      issueDate: issue.issueDate
+        ? issue.issueDate.split("T")[0]
+        : "",
+      dueDate: issue.dueDate
+        ? issue.dueDate.split("T")[0]
+        : "",
       returnDate: issue.returnDate
         ? issue.returnDate.split("T")[0]
         : "",
-      status: issue.status
+      status: issue.status,
     });
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this issue?")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this issue?"
+      )
+    ) {
       return;
     }
 
@@ -102,135 +113,311 @@ const LibraryIssues = () => {
     } catch (error) {
       alert(
         error.response?.data?.message ||
-        "Failed to delete library issue"
+          "Failed to delete library issue"
       );
     }
   };
 
   return (
-    <main className="dashboard">
-      <h2>Library Issues</h2>
+    <main className="dashboard library-issues-page">
+      <div className="library-issues-container">
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="issueId"
-          placeholder="Issue ID"
-          value={formData.issueId}
-          onChange={handleChange}
-          required
-        />
+        <div className="library-issues-header">
+          <div>
+            <h2>Library Issues</h2>
+            <p>
+              Manage book issues, due dates, returns,
+              and overdue records.
+            </p>
+          </div>
 
-        <input
-          name="bookId"
-          placeholder="Book ID"
-          value={formData.bookId}
-          onChange={handleChange}
-          required
-        />
+          <div className="library-issues-count">
+            <strong>{issues.length}</strong>
+            <span>Total Issues</span>
+          </div>
+        </div>
 
-        <input
-          name="studentId"
-          placeholder="Student ID"
-          value={formData.studentId}
-          onChange={handleChange}
-          required
-        />
+        <div className="library-issue-form-card">
 
-        <input
-          name="issueDate"
-          type="date"
-          value={formData.issueDate}
-          onChange={handleChange}
-          required
-        />
+          <div className="section-header">
+            <div>
+              <h3>
+                {editingIssue
+                  ? "Edit Library Issue"
+                  : "Add Library Issue"}
+              </h3>
 
-        <input
-          name="dueDate"
-          type="date"
-          value={formData.dueDate}
-          onChange={handleChange}
-          required
-        />
+              <p>
+                {editingIssue
+                  ? "Update the issue details below."
+                  : "Enter the details to create a new issue record."}
+              </p>
+            </div>
+          </div>
 
-        <input
-          name="returnDate"
-          type="date"
-          value={formData.returnDate}
-          onChange={handleChange}
-        />
+          <form onSubmit={handleSubmit}>
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          required
-        >
-          <option value="Issued">Issued</option>
-          <option value="Returned">Returned</option>
-          <option value="Overdue">Overdue</option>
-        </select>
+            <div className="library-issue-form-grid">
 
-        <button type="submit">
-          {editingIssue
-            ? "Update Issue"
-            : "Add Issue"}
-        </button>
-      </form>
+              <div className="form-group">
+                <label htmlFor="issueId">
+                  Issue ID
+                </label>
 
-      <hr />
+                <input
+                  id="issueId"
+                  name="issueId"
+                  placeholder="Enter issue ID"
+                  value={formData.issueId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-      <h3>Library Issue Records</h3>
+              <div className="form-group">
+                <label htmlFor="bookId">
+                  Book ID
+                </label>
 
-      {issues.length === 0 ? (
-        <p>No library issues found.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Issue ID</th>
-              <th>Book ID</th>
-              <th>Student ID</th>
-              <th>Issue Date</th>
-              <th>Due Date</th>
-              <th>Return Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+                <input
+                  id="bookId"
+                  name="bookId"
+                  placeholder="Enter book ID"
+                  value={formData.bookId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          <tbody>
-            {issues.map((issue) => (
-              <tr key={issue._id}>
-                <td>{issue.issueId}</td>
-                <td>{issue.bookId}</td>
-                <td>{issue.studentId}</td>
-                <td>{issue.issueDate.split("T")[0]}</td>
-                <td>{issue.dueDate.split("T")[0]}</td>
-                <td>
-                  {issue.returnDate
-                    ? issue.returnDate.split("T")[0]
-                    : "-"}
-                </td>
-                <td>{issue.status}</td>
+              <div className="form-group">
+                <label htmlFor="studentId">
+                  Student ID
+                </label>
 
-                <td>
-                  <button
-                    onClick={() => handleEdit(issue)}
-                  >
-                    Edit
-                  </button>
+                <input
+                  id="studentId"
+                  name="studentId"
+                  placeholder="Enter student ID"
+                  value={formData.studentId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-                  <button
-                    onClick={() => handleDelete(issue._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+              <div className="form-group">
+                <label htmlFor="status">
+                  Status
+                </label>
+
+                <select
+                  id="status"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Issued">
+                    Issued
+                  </option>
+
+                  <option value="Returned">
+                    Returned
+                  </option>
+
+                  <option value="Overdue">
+                    Overdue
+                  </option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="issueDate">
+                  Issue Date
+                </label>
+
+                <input
+                  id="issueDate"
+                  name="issueDate"
+                  type="date"
+                  value={formData.issueDate}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="dueDate">
+                  Due Date
+                </label>
+
+                <input
+                  id="dueDate"
+                  name="dueDate"
+                  type="date"
+                  value={formData.dueDate}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="returnDate">
+                  Return Date
+                </label>
+
+                <input
+                  id="returnDate"
+                  name="returnDate"
+                  type="date"
+                  value={formData.returnDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+            </div>
+
+            <div className="library-issue-form-actions">
+
+              {editingIssue && (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetForm}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="primary-button"
+              >
+                {editingIssue
+                  ? "Update Issue"
+                  : "Add Issue"}
+              </button>
+
+            </div>
+
+          </form>
+        </div>
+
+        <div className="library-issue-records-card">
+
+          <div className="section-header">
+            <div>
+              <h3>Library Issue Records</h3>
+              <p>
+                View and manage all library issue records.
+              </p>
+            </div>
+          </div>
+
+          {issues.length === 0 ? (
+            <div className="library-issue-empty-state">
+              <h4>No library issues found</h4>
+              <p>
+                Add your first library issue using the form above.
+              </p>
+            </div>
+          ) : (
+            <div className="library-issue-table-wrapper">
+
+              <table className="library-issue-table">
+
+                <thead>
+                  <tr>
+                    <th>Issue ID</th>
+                    <th>Book ID</th>
+                    <th>Student ID</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {issues.map((issue) => (
+                    <tr key={issue._id}>
+
+                      <td className="issue-id">
+                        {issue.issueId}
+                      </td>
+
+                      <td className="issue-book-id">
+                        {issue.bookId}
+                      </td>
+
+                      <td className="issue-student-id">
+                        {issue.studentId}
+                      </td>
+
+                      <td>
+                        {issue.issueDate
+                          ? issue.issueDate.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        {issue.dueDate
+                          ? issue.dueDate.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        {issue.returnDate
+                          ? issue.returnDate.split("T")[0]
+                          : "-"}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`library-issue-status-badge issue-${issue.status?.toLowerCase()}`}
+                        >
+                          {issue.status}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="library-issue-actions">
+
+                          <button
+                            type="button"
+                            className="edit-button"
+                            onClick={() =>
+                              handleEdit(issue)
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() =>
+                              handleDelete(issue._id)
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
     </main>
   );
 };
