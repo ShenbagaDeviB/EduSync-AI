@@ -7067,3 +7067,63 @@ width: 100%;
     grid-template-columns: 1fr;
   }
 }
+
+/* ================================
+   Navbar
+================================ */
+
+.navbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.navbar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-brand h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.navbar-brand span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 18px;
+  }
+
+  .navbar-brand span {
+    display: none;
+  }
+}
