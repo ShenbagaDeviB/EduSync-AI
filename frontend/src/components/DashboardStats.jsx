@@ -6,7 +6,7 @@ const DashboardStats = () => {
     students: 0,
     faculty: 0,
     courses: 0,
-    attendance: 0
+    attendance: 0,
   });
 
   useEffect(() => {
@@ -16,12 +16,12 @@ const DashboardStats = () => {
           studentsResponse,
           facultyResponse,
           coursesResponse,
-          attendanceResponse
+          attendanceResponse,
         ] = await Promise.all([
           api.get("/students"),
           api.get("/faculties"),
           api.get("/courses"),
-          api.get("/attendance")
+          api.get("/attendance"),
         ]);
 
         const attendance = attendanceResponse.data;
@@ -41,37 +41,63 @@ const DashboardStats = () => {
           students: studentsResponse.data.length,
           faculty: facultyResponse.data.length,
           courses: coursesResponse.data.length,
-          attendance: attendancePercentage
+          attendance: attendancePercentage,
         });
       } catch (error) {
-        console.error("Failed to fetch dashboard stats:", error);
+        console.error(
+          "Failed to fetch dashboard stats:",
+          error
+        );
       }
     };
 
     fetchStats();
   }, []);
 
+  const statCards = [
+    {
+      title: "Total Students",
+      value: stats.students,
+      icon: "S",
+      className: "dashboard-stat-students",
+    },
+    {
+      title: "Total Faculty",
+      value: stats.faculty,
+      icon: "F",
+      className: "dashboard-stat-faculty",
+    },
+    {
+      title: "Total Courses",
+      value: stats.courses,
+      icon: "C",
+      className: "dashboard-stat-courses",
+    },
+    {
+      title: "Attendance",
+      value: `${stats.attendance}%`,
+      icon: "A",
+      className: "dashboard-stat-attendance",
+    },
+  ];
+
   return (
     <div className="dashboard-cards">
-      <div className="dashboard-card">
-        <h3>Total Students</h3>
-        <p>{stats.students}</p>
-      </div>
+      {statCards.map((card) => (
+        <div
+          className={`dashboard-card ${card.className}`}
+          key={card.title}
+        >
+          <div className="dashboard-card-icon">
+            {card.icon}
+          </div>
 
-      <div className="dashboard-card">
-        <h3>Total Faculty</h3>
-        <p>{stats.faculty}</p>
-      </div>
-
-      <div className="dashboard-card">
-        <h3>Total Courses</h3>
-        <p>{stats.courses}</p>
-      </div>
-
-      <div className="dashboard-card">
-        <h3>Attendance</h3>
-        <p>{stats.attendance}%</p>
-      </div>
+          <div className="dashboard-card-content">
+            <span>{card.title}</span>
+            <strong>{card.value}</strong>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
