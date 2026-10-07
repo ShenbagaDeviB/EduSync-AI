@@ -10,7 +10,10 @@ const MainLayout = () => {
 
       <div className="main-content">
         <Navbar />
-        <Outlet />
+
+        <main className="page-content">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

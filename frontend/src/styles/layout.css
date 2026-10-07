@@ -6954,3 +6954,29 @@ width: 100%;
     align-items: flex-start;
   }
 }
+
+/* ================================
+   Main Layout
+================================ */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-content {
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    padding: 18px;
+  }
+}
