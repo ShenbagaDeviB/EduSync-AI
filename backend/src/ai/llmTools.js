@@ -1,71 +1,84 @@
+
+const modules = [
+    "announcements",
+    "attendance",
+    "complaints",
+    "courses",
+    "departments",
+    "documents",
+    "enrollments",
+    "events",
+    "eventRegistrations",
+    "exams",
+    "faculty",
+    "fees",
+    "feedback",
+    "hostels",
+    "hostelAllocations",
+    "hostelRooms",
+    "leaves",
+    "libraryBooks",
+    "libraryIssues",
+    "notifications",
+    "payroll",
+    "results",
+    "students",
+    "subjects",
+    "timetable",
+    "users"
+];
+
 const llmTools = [
     {
-        name: "get_students",
-
-        description: "Get student information",
-
-        parameters: {
-            type: "object",
-            properties: {},
-            required: []
-        }
-    },
-
-    {
-        name: "get_attendance",
-
-        description: "Get attendance information, optionally for a specific student",
-
+        name: "get_module_records",
+        description:
+            "Retrieve existing records from one EduERP module. Use this for requests for actual ERP data, lists, statuses, schedules, and records. Never invent database results.",
         parameters: {
             type: "object",
             properties: {
-                studentId: {
+                module: {
                     type: "string",
-                    description: "Optional unique student ID"
+                    enum: modules,
+                    description: "The ERP module to query."
+                },
+                filters: {
+                    type: "object",
+                    properties: {
+                        studentId: { type: "string" },
+                        status: { type: "string" },
+                        courseId: { type: "string" },
+                        day: { type: "string" },
+                        eventId: { type: "string" },
+                        participantId: { type: "string" },
+                        facultyId: { type: "string" },
+                        departmentId: { type: "string" },
+                        academicYear: { type: "string" },
+                        semester: { type: "number" },
+                        examId: { type: "string" },
+                        subjectId: { type: "string" },
+                        bookId: { type: "string" },
+                        hostelId: { type: "string" },
+                        roomId: { type: "string" },
+                        recipientId: { type: "string" },
+                        category: { type: "string" },
+                        paymentStatus: { type: "string" },
+                        year: { type: "number" },
+                        month: { type: "string" },
+                        isRead: { type: "boolean" },
+                        title: { type: "string" },
+                        name: { type: "string" },
+                        courseName: { type: "string" },
+                        eventType: { type: "string" },
+                        leaveType: { type: "string" },
+                        priority: { type: "string" },
+                        targetAudience: { type: "string" },
+                        role: { type: "string" }
+                    },
+                    additionalProperties: false
                 }
             },
-            required: []
-        }
-    },
-
-    {
-        name: "get_results",
-
-        description: "Get student result information",
-
-        parameters: {
-            type: "object",
-            properties: {},
-            required: []
-        }
-    },
-
-    {
-        name: "get_fee_status",
-
-        description: "Get student fee status",
-
-        parameters: {
-            type: "object",
-            properties: {},
-            required: []
-        }
-    },
-
-    {
-        name: "get_subject_results",
-
-        description: "Get results for a specific student",
-
-        parameters: {
-            type: "object",
-            properties: {
-                studentId: {
-                    type: "string",
-                    description: "The unique student ID"
-                }
-            },
-            required: ["studentId"]
+            required: ["module", "filters"],
+            additionalProperties: false
         }
     }
 ];

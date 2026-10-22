@@ -1,27 +1,18 @@
-const {
-    getStudents,
-    getAttendance,
-    getResults,
-    getFeeStatus,
-    getSubjectResults
-} = require("./aiToolFunctions");
 
-const executeTool = async (toolName, params = {}) => {
+const { getModuleRecords } = require("./aiToolFunctions");
+
+const executeTool = async (
+    toolName,
+    params = {},
+    userRole = null
+) => {
     switch (toolName) {
-        case "get_students":
-            return await getStudents();
-
-        case "get_attendance":
-            return await getAttendance(params.studentId);
-
-        case "get_results":
-            return await getResults();
-
-        case "get_fee_status":
-            return await getFeeStatus();
-
-        case "get_subject_results":
-            return await getSubjectResults(params.studentId);
+        case "get_module_records":
+            return await getModuleRecords(
+                params.module,
+                params.filters || {},
+                userRole
+            );
 
         default:
             throw new Error(`Unknown AI tool: ${toolName}`);

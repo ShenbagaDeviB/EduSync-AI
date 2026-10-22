@@ -1,72 +1,107 @@
-const openai = require("../config/openai");
+
 const { mockLLM } = require("./mockLLMService");
 const llmTools = require("./llmTools");
 
+const OLLAMA_URL = "http://localhost:11434/api/chat";
+const OLLAMA_MODEL = "qwen2.5:3b";
+
 const detectIntent = async (command) => {
     try {
-        const tools = llmTools.map((tool) => ({
-            type: "function",
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.parameters
-        }));
-
-        const response = await openai.responses.create({
-            model: "gpt-6-luna",
-
-            tools,
-
-            tool_choice: "auto",
-
-            input: [
-                {
-                    role: "system",
-                    content: `
-You are the AI decision engine for an Educational ERP system.
-
-Choose the most appropriate tool for the user's command.
-
-If the command does not match any available tool,
-do not call a tool.
+        const response = await fetch(OLLAMA_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: OLLAMA_MODEL,
+                stream: false,
+                format: "json",
+                messages: [
+                    {
+                        role: "system",
+                        content: `
+You are the decision engine for EduSync, an Educational ERP system.
 
 Available tools:
-- get_students
-- get_attendance
-- get_results
-- get_fee_status
-- get_subject_results
-                    `
-                },
-                {
-                    role: "user",
-                    content: command
-                }
-            ]
+${JSON.stringify(llmTools)}
+
+Return only a JSON object in this format:
+{
+  "intent": "get_module_records",
+  "params": {
+    "module": "students",
+    "filters": {}
+  }
+}
+
+For guidance:
+{
+  "intent": "guidance",
+  "params": {"question": "user question"}
+}
+
+For general questions:
+{
+  "intent": "general_question",
+  "params": {"question": "user question"}
+}
+
+Rules:
+- Use get_module_records for requests to retrieve actual ERP records.
+- Select only a module available in the tool definition.
+- Add filters only when the user clearly provides filter values.
+- For general questions and how-to guidance, do not retrieve records.
+- Never invent database records.
+- Return valid JSON only.
+                        `
+                    },
+                    {
+                        role: "user",
+                        content: command
+                    }
+                ]
+            })
         });
 
-        const toolCall = response.output.find(
-            (item) => item.type === "function_call"
-        );
-
-        if (!toolCall) {
-            return {
-                intent: "unknown",
-                params: {}
-            };
+        if (!response.ok) {
+            throw new Error(`Ollama returned HTTP ${response.status}`);
         }
 
-        const params = JSON.parse(toolCall.arguments || "{}");
+        const result = await response.json();
+        const decision = JSON.parse(result.message?.content || "{}");
 
-        console.log("Using OpenAI tool calling");
+        const validIntents = [
+            "get_module_records",
+            "guidance",
+            "general_question"
+        ];
+
+        if (!validIntents.includes(decision.intent)) {
+            throw new Error("Ollama returned an unsupported intent.");
+        }
+
+        if (
+            decision.intent === "get_module_records" &&
+            (
+                typeof decision.params?.module !== "string" ||
+                typeof decision.params?.filters !== "object" ||
+                decision.params.filters === null ||
+                Array.isArray(decision.params.filters)
+            )
+        ) {
+            throw new Error("Ollama returned invalid tool parameters.");
+        }
+
+        console.log("Using Ollama decision engine:", decision);
 
         return {
-            intent: toolCall.name,
-            params
+            intent: decision.intent,
+            params: decision.params || {}
         };
-
     } catch (error) {
-        console.log(
-            "OpenAI unavailable. Using mock LLM fallback."
+        console.error(
+            "Ollama decision failed; using mock fallback:",
+            error.message
         );
 
         const fallbackDecision = await mockLLM(command);
